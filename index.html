@@ -70,7 +70,12 @@
   tbody tr:hover{background:#f4f8fb}
   .cname{font-weight:700}
   .csub{color:var(--muted);font-size:11.5px}
-  .multitag{display:inline-block;font-size:10px;font-weight:700;color:var(--accent);background:#eafaf3;border:1px solid #cdece1;border-radius:6px;padding:1px 5px;margin-left:6px;vertical-align:middle}
+  .prodcell{padding-top:6px;padding-bottom:6px}
+  .prodline{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px dashed var(--line)}
+  .prodline:first-child{border-top:none;padding-top:0}
+  .prodline .pill{flex:0 0 auto}
+  .prodline .raterow{margin-left:auto}
+  .prodline .ratein{width:100px}
   .pill{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid transparent}
   .p-green{background:#e7f6ee;color:#0f7a44;border-color:#c6ead4}
   .p-husk{background:#f4ede2;color:#8a5a2b;border-color:#e6d7c1}
@@ -128,9 +133,8 @@
     #tbl td::before{content:attr(data-label);color:var(--muted);font-size:12px;font-weight:600;text-align:left;flex:0 0 auto}
     #tbl td.cellname{display:block;text-align:left;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:2px}
     #tbl td.cellname::before{display:none}
-    #tbl td.cellprod{align-items:flex-start}
-    #tbl td.cellact{justify-content:flex-end}
-    #tbl td.cellact::before{display:none}
+    #tbl td.prodcell{display:block;text-align:left}
+    #tbl td.prodcell::before{content:"Products & rate";display:block;color:var(--muted);font-size:12px;font-weight:600;margin-bottom:4px}
     .rowbtns{justify-content:flex-end}
     .ibtn{width:36px;height:36px}
     .sheet{border-radius:14px}
@@ -164,7 +168,7 @@
   <!-- CLIENTS -->
   <div class="card">
     <h2>Client Rates <span class="tag" id="cnt"></span></h2>
-    <div class="hint" style="margin:2px 0 12px;color:var(--muted);font-size:12.5px">Type each rate in the box on its row — a client who buys several products shows one line per product. That rate is what gets shared on WhatsApp / SMS.</div>
+    <div class="hint" style="margin:2px 0 12px;color:var(--muted);font-size:12.5px">Type each rate in the box next to its product — a client who buys several products shows all of them under one name. That rate is what gets shared on WhatsApp / SMS.</div>
     <div class="quickset">
       <span class="qs-lbl">⚡ Set today's rate</span>
       <select id="qsGroup" onchange="qsGroupChanged()"></select>
@@ -199,9 +203,7 @@
         <thead><tr>
           <th onclick="sortBy('name')">Client</th>
           <th class="hide-sm" onclick="sortBy('city')">City</th>
-          <th onclick="sortBy('group')">Product</th>
-          <th class="num">Rate (₹)</th>
-          <th></th>
+          <th>Products &amp; Rate (₹)</th>
         </tr></thead>
         <tbody id="rows"></tbody>
       </table>
@@ -436,52 +438,43 @@ let sortKey="name",sortDir=1;
 function sortBy(k){ if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=1;} render(); }
 function render(){
   const q=$("q").value.trim().toLowerCase(),fg=$("fGroup").value,fc=$("fCity").value,fb=$("fBill").value;
-  let rowsData=[];
-  allClients().forEach(c=>{
-    if(fc&&c.city!==fc)return;
-    if(fb&&c.bill!==fb)return;
-    if(q){const h=(c.name+" "+c.city+" "+c.loc+" "+c.contact+" "+c.mat).toLowerCase();if(!h.includes(q))return;}
-    clientProducts(c).forEach((g,idx)=>{
-      if(fg&&g!==fg)return;
-      rowsData.push({c,g,first:idx===0,count:clientProducts(c).length});
-    });
+  let list=allClients().filter(c=>{
+    if(fc&&c.city!==fc)return false;
+    if(fb&&c.bill!==fb)return false;
+    if(fg&&!clientProducts(c).includes(fg))return false;
+    if(q){const h=(c.name+" "+c.city+" "+c.loc+" "+c.contact+" "+c.mat).toLowerCase();if(!h.includes(q))return false;}
+    return true;
   });
-  rowsData.sort((a,b)=>{
-    let x,y;
-    if(sortKey==="group"){x=(GROUPS[a.g]||GROUPS.OTHER).label;y=(GROUPS[b.g]||GROUPS.OTHER).label;}
-    else{x=(a.c[sortKey]||"").toString();y=(b.c[sortKey]||"").toString();}
-    const cmp=x.localeCompare(y)*sortDir;
-    if(cmp!==0)return cmp;
-    if(a.c.id!==b.c.id)return (a.c.id>b.c.id?1:-1);
-    return 0;
-  });
+  const k=(sortKey==="city")?"city":"name";
+  list.sort((a,b)=>((a[k]||"").toString()).localeCompare((b[k]||"").toString())*sortDir);
   const rows=$("rows");rows.innerHTML="";
-  let priced=0;
-  rowsData.forEach(({c,g,count})=>{
-    const gg=GROUPS[g]||GROUPS.OTHER,fr=finalRate(c,g);
-    if(fr.val!=null)priced++;
-    const key=rkey(c.id,g);
-    const multi=count>1?'<span class="multitag">'+count+' products</span>':'';
+  list.forEach(c=>{
+    const prods=clientProducts(c).filter(g=>!fg||g===fg);
+    let lines="";
+    prods.forEach(g=>{
+      const gg=GROUPS[g]||GROUPS.OTHER, key=rkey(c.id,g);
+      lines+='<div class="prodline"><span class="pill '+gg.cls+'">'+gg.label+'</span>'+
+        '<div class="raterow"><span class="rs">₹</span><input class="ratein" type="number" step="0.01" placeholder="0" value="'+(state.rate[key]??"")+'" data-rate="'+key+'"></div>'+
+        '<button class="ibtn" title="Share this rate" onclick="openShare('+c.id+',\''+g+'\')">↗</button></div>';
+    });
+    const del=c.id>=1000?'<button class="ibtn" title="Delete this client" onclick="delClient('+c.id+')" style="margin-left:8px">🗑</button>':'';
     const tr=document.createElement("tr");
     tr.innerHTML=
-      '<td class="cellname"><div class="cname">'+c.name+multi+'</div><div class="csub">'+(c.contact?("📞 "+c.contact):"<span class=muted>no contact</span>")+'</div></td>'+
+      '<td class="cellname"><div class="cname">'+c.name+del+'</div><div class="csub">'+(c.contact?("📞 "+c.contact):"<span class=muted>no contact</span>")+(c.fromSheet?' · ☁ sheet':'')+'</div></td>'+
       '<td class="hide-sm" data-label="City">'+(c.city||"<span class=muted>—</span>")+'<div class="csub">'+(c.loc||"")+'</div></td>'+
-      '<td class="cellprod" data-label="Product"><span class="pill '+gg.cls+'">'+gg.label+'</span>'+(c.fromSheet?'<div class="csub">☁ sheet</div>':'')+'</td>'+
-      '<td class="num" data-label="Rate ('+state.unit+')"><div class="raterow"><span class="rs">₹</span><input class="ratein" type="number" step="0.01" placeholder="0" value="'+(state.rate[key]??"")+'" data-rate="'+key+'"></div></td>'+
-      '<td class="cellact"><div class="rowbtns">'+
-        '<button class="ibtn" title="Share this rate" onclick="openShare('+c.id+',\''+g+'\')">↗</button>'+
-        (c.id>=1000?'<button class="ibtn" title="Delete this added client" onclick="delClient('+c.id+')">🗑</button>':"")+
-      '</div></td>';
+      '<td class="prodcell">'+lines+'</td>';
     rows.appendChild(tr);
   });
   rows.querySelectorAll("input[data-rate]").forEach(inp=>{
-    inp.addEventListener("input",e=>{state.rate[e.target.dataset.rate]=e.target.value;persist();stamp();
-      const tot=allRows(); const pr=tot.filter(r=>finalRate(r.c,r.g).val!=null).length;
-      $("stats").innerHTML="<span><b>"+pr+"</b> priced</span><span><b>"+(tot.length-pr)+"</b> without a rate yet</span>";});
+    inp.addEventListener("input",e=>{state.rate[e.target.dataset.rate]=e.target.value;persist();stamp();updateStats();});
   });
-  const tot=allRows().length;
-  $("cnt").textContent="— "+rowsData.length+" of "+tot+" rate rows";
-  $("stats").innerHTML="<span><b>"+priced+"</b> priced</span><span><b>"+(rowsData.length-priced)+"</b> without a rate yet</span>";
+  const allr=allRows().length;
+  $("cnt").textContent="— "+list.length+" clients shown · "+allr+" rate rows";
+  updateStats();
+}
+function updateStats(){
+  const tot=allRows(); const pr=tot.filter(r=>finalRate(r.c,r.g).val!=null).length;
+  $("stats").innerHTML="<span><b>"+pr+"</b> priced</span><span><b>"+(tot.length-pr)+"</b> without a rate yet</span>";
 }
 
 /* ---------- share card ---------- */
