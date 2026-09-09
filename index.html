@@ -81,7 +81,11 @@
   .p-white{background:#fef6e7;color:#a15c00;border-color:#f3e2b8}
   .p-green{background:#e7f6ee;color:#0f7a44;border-color:#c6ead4}
   .p-husk{background:#f4ede2;color:#8a5a2b;border-color:#e6d7c1}
+  .p-jada{background:#eef4e0;color:#5e7030;border-color:#d9e4bf}
   .p-papu{background:#e8f0fb;color:#1e5bb8;border-color:#cddffa}
+  .p-rawai{background:#fdeee3;color:#b5652a;border-color:#f4d9c3}
+  .p-embry{background:#fcecf1;color:#b03a6b;border-color:#f4cede}
+  .p-kadi{background:#e7f5f5;color:#1f7a7a;border-color:#c9e8e8}
   .p-seed{background:#efeafa;color:#5b3fb0;border-color:#ddd2f4}
   .p-other{background:#eef1f5;color:#556072;border-color:#dde3ec}
   .adj{width:74px}.adj input{text-align:right;padding:6px 8px;font-size:13px}
@@ -152,7 +156,7 @@
       <div class="logo">A</div>
       <div>
         <h1>Adinath — Client Rate Provider</h1>
-        <div class="sub">Tamarind Kernel Powder • Chinchuka • Husk • Papu — daily client rates</div>
+        <div class="sub">Tamarind Kernel Powder • Chinchuka • Husk • Papu • Rawai • Embry • Kadi Kachra — daily client rates</div>
       </div>
     </div>
     <div class="datebox">
@@ -295,9 +299,13 @@
 const GROUPS = {
   TKP_PG:{label:"Tamarind Kernel Powder",  cls:"p-green", meta:"Tamarind Kernel Powder"},
   CHINCHUKA:{label:"Chinchuka (Tamarind Seed)", cls:"p-seed", meta:"Chinchuka — whole tamarind seed"},
-  HUSK:  {label:"Husk / Jada Bhusa",  cls:"p-husk",  meta:"Loose husk · cattlefeed"},
-  PAPU:  {label:"Papu / Seed",        cls:"p-papu",  meta:"Papu, roasted papu, tukdi"},
-  OTHER: {label:"Other",              cls:"p-other", meta:"Embry, Kadi Kachra, Pama, mixed"}
+  HUSK:  {label:"Husk",         cls:"p-husk",  meta:"Loose husk · cattlefeed"},
+  JADA:  {label:"Jada Bhusa",   cls:"p-jada",  meta:"Jada / mix bhusa · cattlefeed"},
+  PAPU:  {label:"Papu",         cls:"p-papu",  meta:"Papu, roasted papu"},
+  RAWAI: {label:"Rawai",        cls:"p-rawai", meta:"Rawai"},
+  EMBRY: {label:"Embry",        cls:"p-embry", meta:"Embry"},
+  KADI:  {label:"Kadi Kachra",  cls:"p-kadi",  meta:"Kadi Kachra"},
+  OTHER: {label:"Other",        cls:"p-other", meta:"Pama, Tukdi, mixed"}
 };
 
 /* ---------- client master data ---------- */
@@ -309,7 +317,7 @@ const CLIENTS = [
  {id:5,name:"B Bold",contact:"7558600449",city:"Surat",loc:"Sachin GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
  {id:6,name:"Best Processors Pvt Ltd",contact:"9481328195",city:"Surat",loc:"Kadodara",group:"HUSK",bill:"",mat:"Husk"},
  {id:7,name:"Bhagyalaxmi",contact:"9924555368",city:"Surat",loc:"Pandesara GIDC",group:"TKP_PG",bill:"",mat:"TKP"},
- {id:8,name:"Baldota",contact:"9890240739",city:"Urli Kanchan",loc:"Yevat / Kem",group:"HUSK",bill:"ADINATH",mat:"Rawai / Embry / Husk"},
+ {id:8,name:"Baldota",contact:"9890240739",city:"Urli Kanchan",loc:"Yevat / Kem",group:"RAWAI",bill:"ADINATH",mat:"Rawai / Embry / Husk"},
  {id:9,name:"Calica Export",contact:"9825007400",city:"Ahmedabad",loc:"Naroda GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
  {id:10,name:"Colourtex",contact:"9481328195",city:"Surat",loc:"Pandesara GIDC",group:"PAPU",bill:"ADINATH",mat:"Papu"},
  {id:11,name:"Creative Traders",contact:"9481328195",city:"Surat",loc:"Kosamba GIDC",group:"HUSK",bill:"ADINATH",mat:"Husk"},
@@ -328,7 +336,7 @@ const CLIENTS = [
  {id:24,name:"M/s Manali Gum Industries",contact:"9422025485",city:"Ankleshwar",loc:"Ankleshwar GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
  {id:25,name:"Maharastra Oil",contact:"9422025485",city:"Dhule",loc:"Awdhan MIDC",group:"HUSK",bill:"ADINATH",mat:"Husk"},
  {id:26,name:"Mangalni Trading",contact:"7666750018",city:"Ichalkaranji",loc:"Maharashtra",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
- {id:27,name:"Mangalya Agro Food",contact:"9921609020",city:"Pune",loc:"Perne Phata",group:"OTHER",bill:"ADINATH",mat:"Kadi Kachra"},
+ {id:27,name:"Mangalya Agro Food",contact:"9921609020",city:"Pune",loc:"Perne Phata",group:"KADI",bill:"ADINATH",mat:"Kadi Kachra"},
  {id:28,name:"Maruti Hydrocolloids",contact:"9426339410",city:"Ahmedabad",loc:"Narol",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
  {id:29,name:"Micro Biopolymers",contact:"9429099994",city:"Surendranagar",loc:"Lakhtar",group:"TKP_PG",bill:"ADESHWAR",mat:"TKP"},
  {id:30,name:"Mithani Herbal Industries",contact:"",city:"Ahmedabad",loc:"Narol Road",group:"TKP_PG",bill:"ADINATH",mat:"TKP / Papu"},
@@ -339,7 +347,7 @@ const CLIENTS = [
  {id:35,name:"Polson Ltd",contact:"2222626117",city:"Kolhapur",loc:"Kolhapur",group:"HUSK",bill:"ADINATH",mat:"Husk"},
  {id:36,name:"Rajshree Dyeing & Printing Mill",contact:"9825143728",city:"Surat",loc:"Tatithaiya",group:"OTHER",bill:"",mat:"—"},
  {id:37,name:"Rudra Industries",contact:"9825817009",city:"Ahmedabad",loc:"Mehsana",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
- {id:38,name:"Sai Iges Power Pvt Ltd",contact:"8605269999",city:"Kolhar",loc:"Kolhar",group:"OTHER",bill:"ADINATH",mat:"Kadi Kachra"},
+ {id:38,name:"Sai Iges Power Pvt Ltd",contact:"8605269999",city:"Kolhar",loc:"Kolhar",group:"KADI",bill:"ADINATH",mat:"Kadi Kachra"},
  {id:39,name:"Sai Krishna Mill",contact:"9481328195",city:"",loc:"",group:"HUSK",bill:"ADINATH",mat:"Husk / Mix Bhusa"},
  {id:40,name:"Sai Sidhab Agro Farms",contact:"9820214311",city:"Mumbai",loc:"Murbad",group:"HUSK",bill:"ADINATH",mat:"Husk"},
  {id:41,name:"Salasar Enterprise",contact:"9825123694",city:"Surat",loc:"Sachin GIDC",group:"PAPU",bill:"ADINATH",mat:"Papu / TKP"},
@@ -351,7 +359,7 @@ const CLIENTS = [
  {id:47,name:"Shree Botanical",contact:"9511890245",city:"A.Nagar",loc:"MIDC / Door pickup",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
  {id:48,name:"Shree Navkar Dyechem",contact:"9481328195",city:"Surat",loc:"Navsari",group:"PAPU",bill:"ADINATH",mat:"Papu"},
  {id:49,name:"Shree Nivas Enterprises",contact:"7046193517",city:"Vapi",loc:"Silvasa",group:"HUSK",bill:"ADINATH",mat:"Husk"},
- {id:50,name:"Shriniwas Agro Ind.",contact:"9552474825",city:"Latur",loc:"Barshi",group:"OTHER",bill:"",mat:"Embry"},
+ {id:50,name:"Shriniwas Agro Ind.",contact:"9552474825",city:"Latur",loc:"Barshi",group:"EMBRY",bill:"",mat:"Embry"},
  {id:51,name:"Siddarth Agro",contact:"9422025485",city:"Jalna",loc:"Maharashtra",group:"HUSK",bill:"ADINATH",mat:"Husk"},
  {id:52,name:"Sri Ram Cooperation",contact:"9924555368",city:"Surat",loc:"Sachin GIDC",group:"TKP_PG",bill:"",mat:"TKP"},
  {id:53,name:"Spectrum Auxi Chem Pvt Ltd",contact:"",city:"Surat",loc:"Palsana",group:"PAPU",bill:"ADINATH",mat:"Papu"},
@@ -370,7 +378,7 @@ const CLIENTS = [
 const KEY="adinath_rate_provider_v1";
 let state={rate:{},groupRate:{},chinchukaSeed:"",unit:"₹/kg",updated:null,clients:[],nextId:1000,sheetUrl:"",sheetAuto:false,sheetClients:[],sheetWhen:null};
 function load(){ try{const s=localStorage.getItem(KEY); if(s)state=Object.assign(state,JSON.parse(s));}catch(e){} if(!state.rate)state.rate={}; if(!state.groupRate)state.groupRate={}; if(state.chinchukaSeed==null)state.chinchukaSeed=""; if(!Array.isArray(state.clients))state.clients=[]; if(!Array.isArray(state.sheetClients))state.sheetClients=[]; if(!state.nextId)state.nextId=1000; fixGroups(state.clients); fixGroups(state.sheetClients); }
-function fixGroups(arr){ if(!Array.isArray(arr))return; arr.forEach(c=>{ if(!GROUPS[c.group]){ const t=((c.group||"")+" "+(c.mat||"")).toUpperCase(); c.group=/CHINCH/.test(t)?"CHINCHUKA":(/TKP|TPK|WHITE|GREEN|PRINT|PLAIN|KERNEL/.test(t)?"TKP_PG":(/HUSK|BHUSA/.test(t)?"HUSK":(/PAPU|PAPPU|ROAST/.test(t)?"PAPU":"OTHER"))); } }); }
+function fixGroups(arr){ if(!Array.isArray(arr))return; arr.forEach(c=>{ if(!GROUPS[c.group]){ c.group=deriveGroup((c.group||"")+" "+(c.mat||""),""); } }); }
 function allClients(){ const base=(state.sheetClients&&state.sheetClients.length)?state.sheetClients:CLIENTS; return base.concat(state.clients); }
 function persist(){ try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){} }
 load();
@@ -528,10 +536,13 @@ function delClient(id){
 function deriveGroup(mat,bag){
   const t=((mat||"")+" "+(bag||"")).toUpperCase();
   if(/CHINCH/.test(t)) return "CHINCHUKA";
-  if(/HUSK|BHUSA|BHUSHA/.test(t)) return "HUSK";
+  if(/RAWAI/.test(t)) return "RAWAI";
+  if(/KADI|KACHRA/.test(t)) return "KADI";
+  if(/EMBRY/.test(t)) return "EMBRY";
+  if(/HUSK/.test(t)) return "HUSK";
+  if(/JADA|BHUSA|BHUSHA/.test(t)) return "JADA";
   if(/PAPU|PAPPU|RAWALI|ROAST/.test(t)) return "PAPU";
-  if(/TKP|TPK/.test(t)) return "TKP_PG";
-  if(/EMBRY|KADI|KACHRA|PAMA|TUKDI/.test(t)) return "OTHER";
+  if(/TKP|TPK|KERNEL/.test(t)) return "TKP_PG";
   return "OTHER";
 }
 function parseCSV(text){
