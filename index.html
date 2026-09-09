@@ -171,7 +171,7 @@
       <span class="rs">₹</span>
       <input type="number" step="0.01" id="qsRate" placeholder="rate">
       <button class="btn primary" onclick="applyQuick()">Apply to all</button>
-      <span class="qs-note">fills every client on this product with this rate — you can still change any one after.</span>
+      <span class="qs-note">pick "All clients" or a product, type the rate, press Apply — it fills those rows. You can still change any one after.</span>
     </div>
     <div class="toolbar">
       <button class="btn primary" onclick="openAdd()">➕ Add Client</button>
@@ -383,8 +383,10 @@ function stamp(){ state.updated=todayStr()+" "+new Date().toLocaleTimeString("en
 function initFilters(){
   const g=$("fGroup");Object.entries(GROUPS).forEach(([k,v])=>{const o=document.createElement("option");o.value=k;o.textContent=v.label;g.appendChild(o);});
   const ag=$("acGroup");Object.entries(GROUPS).forEach(([k,v])=>{const o=document.createElement("option");o.value=k;o.textContent=v.label;ag.appendChild(o);});
-  const qg=$("qsGroup");Object.entries(GROUPS).forEach(([k,v])=>{const o=document.createElement("option");o.value=k;o.textContent=v.label;qg.appendChild(o);});
-  qg.value="CHINCHUKA"; qsGroupChanged();
+  const qg=$("qsGroup");
+  const allOpt=document.createElement("option");allOpt.value="__ALL__";allOpt.textContent="All clients (every product)";qg.appendChild(allOpt);
+  Object.entries(GROUPS).forEach(([k,v])=>{const o=document.createElement("option");o.value=k;o.textContent=v.label;qg.appendChild(o);});
+  qg.value="__ALL__"; qsGroupChanged();
   rebuildCities();
 }
 function rebuildCities(){
@@ -602,16 +604,16 @@ function disconnectSheet(){ state.sheetUrl="";state.sheetAuto=false;state.sheetC
 function updateSyncPill(){ const p=$("syncPill"); if(state.sheetClients&&state.sheetClients.length){p.style.display="inline";p.textContent="● on";}else{p.style.display="none";} }
 
 /* ---------- quick set rate by product ---------- */
-function qsGroupChanged(){ const g=$("qsGroup").value; const v=(state.groupRate&&state.groupRate[g]!=null)?state.groupRate[g]:""; $("qsRate").value=v; }
+function qsGroupChanged(){ const g=$("qsGroup").value; const v=(g!=="__ALL__"&&state.groupRate&&state.groupRate[g]!=null)?state.groupRate[g]:""; $("qsRate").value=v; }
 function applyQuick(){
   const g=$("qsGroup").value, val=$("qsRate").value.trim();
-  const label=(GROUPS[g]||GROUPS.OTHER).label;
   if(val===""){flash("Enter a rate first");$("qsRate").focus();return;}
-  state.groupRate[g]=val;
-  const targets=allClients().filter(c=>c.group===g);
+  let targets,label;
+  if(g==="__ALL__"){ targets=allClients(); label="all clients"; }
+  else { label=(GROUPS[g]||GROUPS.OTHER).label; state.groupRate[g]=val; targets=allClients().filter(c=>c.group===g); }
   targets.forEach(c=>{state.rate[c.id]=val;});
   persist();
-  if(targets.length){ stamp(); render(); flash("✓ ₹"+val+" set for "+targets.length+" "+label+" client"+(targets.length>1?"s":"")); }
+  if(targets.length){ stamp(); render(); flash("✓ ₹"+val+" applied to "+targets.length+(g==="__ALL__"?" client"+(targets.length>1?"s":""):" "+label+" client"+(targets.length>1?"s":""))); }
   else{ render(); flash("Saved ₹"+val+" for "+label+" — any client you set to this product will use it."); }
 }
 
