@@ -181,7 +181,7 @@
       <span class="rs">₹</span>
       <input type="number" step="0.01" id="seedRate" placeholder="seed rate" oninput="seedPreview()">
       <button class="btn primary" onclick="applySeed()">Auto-price TKP</button>
-      <span class="qs-note" id="seedNote">TKP rate = seed ÷ 0.60 + seed → auto-fills every Tamarind Kernel Powder client.</span>
+      <span class="qs-note" id="seedNote">TKP rate = seed ÷ 0.60 + 10 → auto-fills every Tamarind Kernel Powder client.</span>
     </div>
     <div class="toolbar">
       <button class="btn primary" onclick="openAdd()">➕ Add Client</button>
@@ -628,13 +628,13 @@ function applyQuick(){
 }
 
 /* ---------- Chinchuka seed → TKP auto-pricing ---------- */
-/* TKP client rate = seed ÷ 0.60 + seed */
-function seedFormula(seed){ const s=Number(seed); if(seed===""||isNaN(s)) return null; return Math.round((s/0.6 + s)*100)/100; }
+/* TKP client rate = seed ÷ 0.60 + 10 */
+function seedFormula(seed){ const s=Number(seed); if(seed===""||isNaN(s)) return null; return Math.round((s/0.6 + 10)*100)/100; }
 function seedPreview(){
   const s=$("seedRate").value.trim(), note=$("seedNote");
-  if(s===""){ note.innerHTML="TKP rate = seed ÷ 0.60 + seed → auto-fills every Tamarind Kernel Powder client."; return; }
+  if(s===""){ note.innerHTML="TKP rate = seed ÷ 0.60 + 10 → auto-fills every Tamarind Kernel Powder client."; return; }
   const t=seedFormula(s);
-  note.innerHTML="TKP rate = ₹"+s+" ÷ 0.60 + ₹"+s+" = <b>₹"+fmt(t)+"</b> for every TKP client";
+  note.innerHTML="TKP rate = ₹"+s+" ÷ 0.60 + 10 = <b>₹"+fmt(t)+"</b> for every TKP client";
 }
 function applySeed(){
   const s=$("seedRate").value.trim();
