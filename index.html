@@ -53,6 +53,14 @@
   .unit{color:var(--muted);font-size:11.5px;white-space:nowrap}
   .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
   .toolbar .grow{flex:1;min-width:180px}
+  .quickset{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:linear-gradient(135deg,#eafaf3,#eef3ff);
+    border:1px solid #d3e8de;border-radius:12px;padding:11px 13px;margin-bottom:14px}
+  .quickset .qs-lbl{font-weight:800;font-size:13px;color:var(--headA);display:flex;align-items:center;gap:6px}
+  .quickset select{width:auto;min-width:160px}
+  .quickset .rs{color:var(--accent);font-weight:800;font-size:16px}
+  .quickset input{width:120px;text-align:right;font-weight:800;font-size:15px;color:var(--accent)}
+  .quickset .qs-note{color:var(--muted);font-size:12px}
+  @media (max-width:760px){.quickset{gap:6px;padding:10px}.quickset select{flex:1;min-width:120px}.quickset input{flex:1;width:auto;min-width:80px}.quickset .qs-note{width:100%;order:9}.quickset .btn{flex:1}}
   .btn{background:#fff;border:1px solid var(--line);color:var(--ink);border-radius:9px;
     padding:9px 13px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;font-weight:500}
   .btn:hover{border-color:var(--accent);color:var(--accent)}
@@ -157,6 +165,14 @@
   <div class="card">
     <h2>Client Rates <span class="tag" id="cnt"></span></h2>
     <div class="hint" style="margin:2px 0 12px;color:var(--muted);font-size:12.5px">Type each client's rate in the box on their row — that rate is what gets shared on WhatsApp / SMS.</div>
+    <div class="quickset">
+      <span class="qs-lbl">⚡ Set today's rate</span>
+      <select id="qsGroup" onchange="qsGroupChanged()"></select>
+      <span class="rs">₹</span>
+      <input type="number" step="0.01" id="qsRate" placeholder="rate">
+      <button class="btn primary" onclick="applyQuick()">Apply to all</button>
+      <span class="qs-note">fills every client on this product with this rate — you can still change any one after.</span>
+    </div>
     <div class="toolbar">
       <button class="btn primary" onclick="openAdd()">➕ Add Client</button>
       <button class="btn" onclick="setUnit()">Unit: <span id="unitLbl">₹/kg</span></button>
@@ -342,8 +358,8 @@ const CLIENTS = [
 
 /* ---------- state ---------- */
 const KEY="adinath_rate_provider_v1";
-let state={rate:{},unit:"₹/kg",updated:null,clients:[],nextId:1000,sheetUrl:"",sheetAuto:false,sheetClients:[],sheetWhen:null};
-function load(){ try{const s=localStorage.getItem(KEY); if(s)state=Object.assign(state,JSON.parse(s));}catch(e){} if(!state.rate)state.rate={}; if(!Array.isArray(state.clients))state.clients=[]; if(!Array.isArray(state.sheetClients))state.sheetClients=[]; if(!state.nextId)state.nextId=1000; fixGroups(state.clients); fixGroups(state.sheetClients); }
+let state={rate:{},groupRate:{},unit:"₹/kg",updated:null,clients:[],nextId:1000,sheetUrl:"",sheetAuto:false,sheetClients:[],sheetWhen:null};
+function load(){ try{const s=localStorage.getItem(KEY); if(s)state=Object.assign(state,JSON.parse(s));}catch(e){} if(!state.rate)state.rate={}; if(!state.groupRate)state.groupRate={}; if(!Array.isArray(state.clients))state.clients=[]; if(!Array.isArray(state.sheetClients))state.sheetClients=[]; if(!state.nextId)state.nextId=1000; fixGroups(state.clients); fixGroups(state.sheetClients); }
 function fixGroups(arr){ if(!Array.isArray(arr))return; arr.forEach(c=>{ if(!GROUPS[c.group]){ const t=((c.group||"")+" "+(c.mat||"")).toUpperCase(); c.group=/CHINCH/.test(t)?"CHINCHUKA":(/TKP|TPK|WHITE|GREEN|PRINT|PLAIN|KERNEL/.test(t)?"TKP_PG":(/HUSK|BHUSA/.test(t)?"HUSK":(/PAPU|PAPPU|ROAST/.test(t)?"PAPU":"OTHER"))); } }); }
 function allClients(){ const base=(state.sheetClients&&state.sheetClients.length)?state.sheetClients:CLIENTS; return base.concat(state.clients); }
 function persist(){ try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){} }
@@ -367,6 +383,8 @@ function stamp(){ state.updated=todayStr()+" "+new Date().toLocaleTimeString("en
 function initFilters(){
   const g=$("fGroup");Object.entries(GROUPS).forEach(([k,v])=>{const o=document.createElement("option");o.value=k;o.textContent=v.label;g.appendChild(o);});
   const ag=$("acGroup");Object.entries(GROUPS).forEach(([k,v])=>{const o=document.createElement("option");o.value=k;o.textContent=v.label;ag.appendChild(o);});
+  const qg=$("qsGroup");Object.entries(GROUPS).forEach(([k,v])=>{const o=document.createElement("option");o.value=k;o.textContent=v.label;qg.appendChild(o);});
+  qg.value="CHINCHUKA"; qsGroupChanged();
   rebuildCities();
 }
 function rebuildCities(){
@@ -482,6 +500,7 @@ function saveClient(){
   state.clients.push({id,name,contact:$("acContact").value.trim(),city:$("acCity").value.trim(),loc:$("acLoc").value.trim(),group:g,bill:$("acBill").value,mat:GROUPS[g].label});
   const rv=$("acAdj").value;
   if(rv!=="")state.rate[id]=rv;
+  else if(state.groupRate&&state.groupRate[g]!=null&&state.groupRate[g]!=="")state.rate[id]=state.groupRate[g];
   persist();rebuildCities();render();close_("addModal");flash("✓ "+name+" added");
 }
 function delClient(id){
@@ -582,11 +601,25 @@ function disconnectSheet(){ state.sheetUrl="";state.sheetAuto=false;state.sheetC
   $("syncStat").textContent=""; $("sheetUrl").value=""; $("sheetAuto").checked=false; flash("Disconnected — back to built-in list"); }
 function updateSyncPill(){ const p=$("syncPill"); if(state.sheetClients&&state.sheetClients.length){p.style.display="inline";p.textContent="● on";}else{p.style.display="none";} }
 
+/* ---------- quick set rate by product ---------- */
+function qsGroupChanged(){ const g=$("qsGroup").value; const v=(state.groupRate&&state.groupRate[g]!=null)?state.groupRate[g]:""; $("qsRate").value=v; }
+function applyQuick(){
+  const g=$("qsGroup").value, val=$("qsRate").value.trim();
+  const label=(GROUPS[g]||GROUPS.OTHER).label;
+  if(val===""){flash("Enter a rate first");$("qsRate").focus();return;}
+  state.groupRate[g]=val;
+  const targets=allClients().filter(c=>c.group===g);
+  targets.forEach(c=>{state.rate[c.id]=val;});
+  persist();
+  if(targets.length){ stamp(); render(); flash("✓ ₹"+val+" set for "+targets.length+" "+label+" client"+(targets.length>1?"s":"")); }
+  else{ render(); flash("Saved ₹"+val+" for "+label+" — any client you set to this product will use it."); }
+}
+
 /* ---------- misc ---------- */
 function close_(id){$(id).classList.remove("show");}
 function setUnit(){const opts=["₹/kg","₹/quintal","₹/MT","₹/bag"];let i=opts.indexOf(state.unit);state.unit=opts[(i+1)%opts.length];persist();$("unitLbl").textContent=state.unit;render();flash("Unit: "+state.unit);}
 function exportData(){const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="adinath-rates-backup.json";a.click();flash("Backup downloaded");}
-function importData(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{state=Object.assign(state,JSON.parse(e.target.result));if(!state.rate)state.rate={};if(!Array.isArray(state.clients))state.clients=[];if(!Array.isArray(state.sheetClients))state.sheetClients=[];if(!state.nextId)state.nextId=1000;fixGroups(state.clients);fixGroups(state.sheetClients);persist();rebuildCities();render();$("unitLbl").textContent=state.unit;$("lastUpd").textContent=state.updated?("Updated "+state.updated):"Rates not set yet";flash("Backup restored");}catch(x){flash("Invalid file");}};r.readAsText(f);}
+function importData(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{state=Object.assign(state,JSON.parse(e.target.result));if(!state.rate)state.rate={};if(!state.groupRate)state.groupRate={};if(!Array.isArray(state.clients))state.clients=[];if(!Array.isArray(state.sheetClients))state.sheetClients=[];if(!state.nextId)state.nextId=1000;fixGroups(state.clients);fixGroups(state.sheetClients);persist();rebuildCities();render();$("unitLbl").textContent=state.unit;$("lastUpd").textContent=state.updated?("Updated "+state.updated):"Rates not set yet";flash("Backup restored");}catch(x){flash("Invalid file");}};r.readAsText(f);}
 
 /* ---------- init ---------- */
 $("today").textContent=todayStr();
