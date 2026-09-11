@@ -136,6 +136,16 @@
     body{font-size:14px}
     .toolbar{gap:8px}
   }
+  /* EA read-only view: hide all rate-setting controls */
+  body.ea .quickset{display:none}
+  body.ea .md-only{display:none!important}
+  body.ea #mdHint{display:none}
+  body.ea #eaHint{display:block!important}
+  body.ea .prodline .baseinfo,
+  body.ea .prodline .plus,
+  body.ea .prodline .premin{display:none}
+  body.ea .prodline .eq{margin-left:0}
+  body.ea .prodline{gap:12px}
 </style>
 </head>
 <body>
@@ -144,8 +154,8 @@
     <div class="brand">
       <div class="logo">A</div>
       <div>
-        <h1>Adinath — Client Rate Provider</h1>
-        <div class="sub">Client rate = product base + each client's own adjustment</div>
+        <h1 id="headTitle">Adinath — Client Rate Provider</h1>
+        <div class="sub" id="headSub">Client rate = product base + each client's own adjustment</div>
       </div>
     </div>
     <div class="datebox">
@@ -159,8 +169,9 @@
 
   <!-- CLIENTS -->
   <div class="card">
-    <h2>Client Rates <span class="tag" id="cnt"></span></h2>
-    <div class="hint" style="margin:2px 0 12px;color:var(--muted);font-size:12.5px">Each client's rate = the product's <b>base</b> + that client's own <b>+/− adjustment</b> (the blue box). Set the base once and every client's final rate updates automatically.</div>
+    <h2 id="cardTitle">Client Rates <span class="tag" id="cnt"></span></h2>
+    <div class="hint" id="mdHint" style="margin:2px 0 12px;color:var(--muted);font-size:12.5px">Each client's rate = the product's <b>base</b> + that client's own <b>+/− adjustment</b> (the blue box). Set the base once and every client's final rate updates automatically.</div>
+    <div class="hint" id="eaHint" style="display:none;margin:2px 0 12px;color:var(--muted);font-size:12.5px">Today's client rates from Adinath. This is a view-only page — the final rate for each client is shown below. Tap ↗ to send a rate on WhatsApp or SMS.</div>
     <div class="quickset">
       <span class="qs-lbl">⚡ Set base rate</span>
       <select id="qsGroup" onchange="qsGroupChanged()"></select>
@@ -177,11 +188,12 @@
       <span class="qs-note" id="seedNote">TKP base = seed ÷ 0.60 + 10. Each TKP client = this base + their adjustment.</span>
     </div>
     <div class="toolbar">
-      <button class="btn primary" onclick="openAdd()">➕ Add Client</button>
+      <button class="btn primary md-only" onclick="openEa()">📤 Give to EA</button>
+      <button class="btn primary md-only" onclick="openAdd()">➕ Add Client</button>
       <button class="btn" onclick="setUnit()">Unit: <span id="unitLbl">₹/kg</span></button>
-      <button class="btn" onclick="openSheet()">☁ Sheet sync <span id="syncPill" style="display:none;color:var(--green);font-weight:700"></span></button>
-      <button class="btn" onclick="exportData()">⬇ Export</button>
-      <button class="btn" onclick="document.getElementById('imp').click()">⬆ Import</button>
+      <button class="btn md-only" onclick="openSheet()">☁ Sheet sync <span id="syncPill" style="display:none;color:var(--green);font-weight:700"></span></button>
+      <button class="btn md-only" onclick="exportData()">⬇ Export</button>
+      <button class="btn md-only" onclick="document.getElementById('imp').click()">⬆ Import</button>
       <input type="file" id="imp" accept="application/json" style="display:none" onchange="importData(event)">
       <input class="grow" type="text" id="q" placeholder="🔍 Search client, city or contact…" oninput="render()">
       <select id="fGroup" onchange="render()" style="width:auto"><option value="">All products</option></select>
@@ -195,7 +207,7 @@
         <thead><tr>
           <th onclick="sortBy('name')">Client</th>
           <th class="hide-sm" onclick="sortBy('city')">City</th>
-          <th>Products · base + adj = rate (₹)</th>
+          <th id="prodHead">Products · base + adj = rate (₹)</th>
         </tr></thead>
         <tbody id="rows"></tbody>
       </table>
@@ -270,6 +282,22 @@
       </div>
       <div class="hint" style="margin:14px 0 0;line-height:1.5">
         <b>One-time setup:</b> open the sheet → <b>Share</b> → <b>"Anyone with the link → Viewer"</b>, then paste the link above.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GIVE TO EA MODAL -->
+<div class="modal" id="eaModal" onclick="if(event.target===this)close_('eaModal')">
+  <div class="sheet">
+    <div class="hd"><b>📤 Give this rate view to your EA</b><button class="ibtn" onclick="close_('eaModal')">✕</button></div>
+    <div class="bd">
+      <div class="hint" style="margin-top:0">Send this link to your EA. It opens a <b>view-only</b> page that shows only the <b>final rate</b> for each client — no base-rate bar, no seed bar, no adjustment boxes. Re-send the link whenever you change today's rates.</div>
+      <div class="field"><label>EA link</label><input type="text" id="eaLink" readonly onclick="this.select()"></div>
+      <div id="eaWarn" class="hint" style="display:none;color:var(--red);margin:0 0 10px">⚠ You haven't set any rates yet — set a base rate first, then share.</div>
+      <div class="toolbar" style="margin:4px 0 0">
+        <button class="btn primary grow" onclick="copyEaLink()">📋 Copy link</button>
+        <button class="btn grow" style="background:#25D366;border-color:#25D366;color:#062015" onclick="waEaLink()">🟢 Send on WhatsApp</button>
       </div>
     </div>
   </div>
@@ -362,14 +390,41 @@ const CLIENTS = [
 
 /* ---------- state ---------- */
 const KEY="adinath_rate_provider_v1";
+const EA_KEY="adinath_rate_ea_v1";
+const APP_URL="https://htmlpreview.github.io/?https://raw.githubusercontent.com/mis429/adinath-rate-provider/main/index.html";
+
+/* EA read-only mode: detect a shared link (#ea=DATA or role=ea) */
+function eaPayloadFromHash(){
+  var h=(location.hash||"")+" "+(location.search||"");
+  var m=h.match(/ea=([^&\s#]+)/);
+  if(!m) return null;
+  try{ return JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(m[1]))))); }catch(e){ return null; }
+}
+var EA_INCOMING=eaPayloadFromHash();
+var IS_EA = !!EA_INCOMING || /ea=/.test(location.hash) || /role=ea/i.test(location.href);
+
 let state={base:{},premium:{},chinchukaSeed:"",unit:"₹/kg",updated:null,clients:[],nextId:1000,sheetUrl:"",sheetAuto:false,sheetClients:[],sheetWhen:null};
-function load(){ try{const s=localStorage.getItem(KEY); if(s)state=Object.assign(state,JSON.parse(s));}catch(e){} if(!state.base)state.base={}; if(!state.premium)state.premium={}; if(state.chinchukaSeed==null)state.chinchukaSeed=""; if(!Array.isArray(state.clients))state.clients=[]; if(!Array.isArray(state.sheetClients))state.sheetClients=[]; if(!state.nextId)state.nextId=1000; fixGroups(state.clients); fixGroups(state.sheetClients); }
+function load(){
+  if(IS_EA){
+    var p=EA_INCOMING;
+    if(!p){ try{const s=localStorage.getItem(EA_KEY); if(s)p=JSON.parse(s);}catch(e){} }
+    if(p){
+      state.base=p.base||{}; state.premium=p.premium||{}; state.chinchukaSeed=p.chinchukaSeed||"";
+      state.unit=p.unit||"₹/kg"; state.updated=p.updated||null;
+      try{localStorage.setItem(EA_KEY,JSON.stringify(p));}catch(e){}
+    }
+    state.clients=[]; state.sheetClients=[];
+    fixGroups(state.clients);
+    return;
+  }
+  try{const s=localStorage.getItem(KEY); if(s)state=Object.assign(state,JSON.parse(s));}catch(e){} if(!state.base)state.base={}; if(!state.premium)state.premium={}; if(state.chinchukaSeed==null)state.chinchukaSeed=""; if(!Array.isArray(state.clients))state.clients=[]; if(!Array.isArray(state.sheetClients))state.sheetClients=[]; if(!state.nextId)state.nextId=1000; fixGroups(state.clients); fixGroups(state.sheetClients);
+}
 function fixGroups(arr){ if(!Array.isArray(arr))return; arr.forEach(c=>{ if(!GROUPS[c.group]){ c.group=deriveGroup((c.group||"")+" "+(c.mat||""),""); } if(Array.isArray(c.products)) c.products=c.products.filter(g=>GROUPS[g]); }); }
 function clientProducts(c){ return (Array.isArray(c.products)&&c.products.length)?c.products:[c.group||"OTHER"]; }
 function rkey(id,g){ return id+"@"+g; }
 function allClients(){ const base=(state.sheetClients&&state.sheetClients.length)?state.sheetClients:CLIENTS; return base.concat(state.clients); }
 function allRows(){ const out=[]; allClients().forEach(c=>clientProducts(c).forEach(g=>out.push({c,g}))); return out; }
-function persist(){ try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){} }
+function persist(){ if(IS_EA)return; try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){} }
 load();
 
 /* ---------- helpers ---------- */
@@ -432,13 +487,20 @@ function render(){
       const gg=GROUPS[g]||GROUPS.OTHER, key=rkey(c.id,g), fr=finalRate(c,g);
       const bShow=fr.base==null?"—":"₹"+fmt(fr.base);
       const finalShow=fr.val==null?"—":"₹"+fmt(fr.val);
-      lines+='<div class="prodline">'+
-        '<span class="pill '+gg.cls+'">'+gg.label+'</span>'+
-        '<span class="baseinfo">base '+bShow+'</span>'+
-        '<span class="plus">+</span>'+
-        '<input class="premin" type="number" step="0.01" placeholder="0" value="'+getPrem(c,g)+'" data-prem="'+key+'">'+
-        '<span class="eq">= <b>'+finalShow+'</b></span>'+
-        '<button class="ibtn" title="Share this rate" onclick="openShare('+c.id+',\''+g+'\')">↗</button></div>';
+      if(IS_EA){
+        lines+='<div class="prodline">'+
+          '<span class="pill '+gg.cls+'">'+gg.label+'</span>'+
+          '<span class="eq">= <b>'+finalShow+'</b></span>'+
+          '<button class="ibtn" title="Share this rate" onclick="openShare('+c.id+',\''+g+'\')">↗</button></div>';
+      }else{
+        lines+='<div class="prodline">'+
+          '<span class="pill '+gg.cls+'">'+gg.label+'</span>'+
+          '<span class="baseinfo">base '+bShow+'</span>'+
+          '<span class="plus">+</span>'+
+          '<input class="premin" type="number" step="0.01" placeholder="0" value="'+getPrem(c,g)+'" data-prem="'+key+'">'+
+          '<span class="eq">= <b>'+finalShow+'</b></span>'+
+          '<button class="ibtn" title="Share this rate" onclick="openShare('+c.id+',\''+g+'\')">↗</button></div>';
+      }
     });
     const del=c.id>=1000?'<button class="ibtn" title="Delete this client" onclick="delClient('+c.id+')" style="margin-left:8px">🗑</button>':'';
     const tr=document.createElement("tr");
@@ -448,7 +510,7 @@ function render(){
       '<td class="prodcell">'+lines+'</td>';
     rows.appendChild(tr);
   });
-  rows.querySelectorAll("input[data-prem]").forEach(inp=>{
+  if(!IS_EA) rows.querySelectorAll("input[data-prem]").forEach(inp=>{
     inp.addEventListener("input",e=>{
       const key=e.target.dataset.prem; state.premium[key]=e.target.value; persist(); stamp();
       const p=key.indexOf("@"); const idStr=key.slice(0,p), g=key.slice(p+1);
@@ -668,6 +730,32 @@ function applySeed(){
   flash("✓ Seed ₹"+s+" → TKP base ₹"+fmt(t)+" ("+n+" TKP client"+(n!==1?"s":"")+")");
 }
 
+/* ---------- Give to EA (share link) ---------- */
+function makeEaLink(){
+  const payload={base:state.base,premium:state.premium,chinchukaSeed:state.chinchukaSeed,unit:state.unit,updated:state.updated};
+  const enc=encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(payload)))));
+  return APP_URL+"#ea="+enc;
+}
+function openEa(){
+  const link=makeEaLink();
+  $("eaLink").value=link;
+  const hasRates=Object.keys(state.base||{}).some(k=>state.base[k]!=null&&state.base[k]!=="");
+  $("eaWarn").style.display=hasRates?"none":"block";
+  $("eaModal").classList.add("show");
+  setTimeout(()=>{$("eaLink").focus();$("eaLink").select();},60);
+}
+function copyEaLink(){
+  const t=$("eaLink").value;
+  navigator.clipboard.writeText(t).then(()=>flash("Link copied — send it to your EA"))
+    .catch(()=>{const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();flash("Link copied");});
+}
+function waEaLink(){
+  const t=$("eaLink").value;
+  const msg="Adinath — today's client rates (view-only):\n"+t;
+  window.open("https://wa.me/?text="+encodeURIComponent(msg),"_blank");
+  flash("Opening WhatsApp…");
+}
+
 /* ---------- misc ---------- */
 function close_(id){$(id).classList.remove("show");}
 function setUnit(){const opts=["₹/kg","₹/quintal","₹/MT","₹/bag"];let i=opts.indexOf(state.unit);state.unit=opts[(i+1)%opts.length];persist();$("unitLbl").textContent=state.unit;render();flash("Unit: "+state.unit);}
@@ -677,10 +765,23 @@ function importData(ev){const f=ev.target.files[0];if(!f)return;const r=new File
 /* ---------- init ---------- */
 $("today").textContent=todayStr();
 $("unitLbl").textContent=state.unit;
-if(state.updated)$("lastUpd").textContent="Updated "+state.updated;
-initFilters();render();updateSyncPill();
-if(state.chinchukaSeed){ $("seedRate").value=state.chinchukaSeed; } seedPreview();
-if(state.sheetUrl){ setupAutoSync(); fetchSheet(true); }
+
+if(IS_EA){
+  document.body.classList.add("ea");
+  $("headTitle").textContent="Adinath — Client Rates";
+  $("headSub").textContent="View-only rate list for the team";
+  $("cardTitle").firstChild.textContent="Today's Client Rates ";
+  $("prodHead").textContent="Products · rate (₹)";
+  $("lastUpd").textContent=state.updated?("Rates as of "+state.updated):"No rates received yet";
+  document.title="Adinath — Client Rates";
+  initFilters();
+  render();
+}else{
+  if(state.updated)$("lastUpd").textContent="Updated "+state.updated;
+  initFilters();render();updateSyncPill();
+  if(state.chinchukaSeed){ $("seedRate").value=state.chinchukaSeed; } seedPreview();
+  if(state.sheetUrl){ setupAutoSync(); fetchSheet(true); }
+}
 </script>
 </body>
 </html>
