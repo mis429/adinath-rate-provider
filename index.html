@@ -160,12 +160,21 @@
   <!-- CLIENTS -->
   <div class="card">
     <h2>Client Rates <span class="tag" id="cnt"></span></h2>
-    <div class="hint" style="margin:2px 0 12px;color:var(--muted);font-size:12.5px">Each client's rate = the product's <b>base</b> + that client's own <b>+/− adjustment</b> (the blue box). Base rates come live from your Google Sheet.</div>
-    <div class="quickset" style="align-items:flex-start">
-      <span class="qs-lbl">📋 Today's base rates</span>
-      <span id="baseChips" class="qs-note" style="flex:1;min-width:220px;font-size:12.5px"></span>
-      <button class="btn" onclick="fetchBaseFromSheet(false)">🔄 Refresh</button>
-      <span class="qs-note" id="baseSync" style="width:100%;order:9">Base rates load live from your Google Sheet's <b>Base</b> tab — the MD edits them there.</span>
+    <div class="hint" style="margin:2px 0 12px;color:var(--muted);font-size:12.5px">Each client's rate = the product's <b>base</b> + that client's own <b>+/− adjustment</b> (the blue box). Set the base once and every client's final rate updates automatically.</div>
+    <div class="quickset">
+      <span class="qs-lbl">⚡ Set base rate</span>
+      <select id="qsGroup" onchange="qsGroupChanged()"></select>
+      <span class="rs">₹</span>
+      <input type="number" step="0.01" id="qsRate" placeholder="base">
+      <button class="btn primary" onclick="applyQuick()">Set base</button>
+      <span class="qs-note">sets the base for this product; every client on it becomes base + their adjustment.</span>
+    </div>
+    <div class="quickset seedbar">
+      <span class="qs-lbl">🌰 Chinchuka seed rate</span>
+      <span class="rs">₹</span>
+      <input type="number" step="0.01" id="seedRate" placeholder="seed rate" oninput="seedPreview()">
+      <button class="btn primary" onclick="applySeed()">Set TKP base</button>
+      <span class="qs-note" id="seedNote">TKP base = seed ÷ 0.60 + 10. Each TKP client = this base + their adjustment.</span>
     </div>
     <div class="toolbar">
       <button class="btn primary" onclick="openAdd()">➕ Add Client</button>
@@ -269,8 +278,6 @@
 <div class="flash" id="flash"></div>
 
 <script>
-/* ROLE: add ?role=ea to the link for the read-only EA mirror; otherwise full MD view. */
-var ROLE=/role=ea/i.test(location.search)?"EA":"MD";
 /* ---------- product groups ---------- */
 const GROUPS = {
   TKP_PG:{label:"Tamarind Kernel Powder",  cls:"p-green", meta:"Tamarind Kernel Powder"},
@@ -391,6 +398,8 @@ function initFilters(){
     lab.querySelector("input").addEventListener("change",e=>lab.classList.toggle("on",e.target.checked));
     ap.appendChild(lab);
   });
+  const qg=$("qsGroup");Object.entries(GROUPS).forEach(([k,v])=>{const o=document.createElement("option");o.value=k;o.textContent=v.label;qg.appendChild(o);});
+  qg.value="HUSK"; qsGroupChanged();
   rebuildCities();
 }
 function rebuildCities(){
@@ -427,7 +436,7 @@ function render(){
         '<span class="pill '+gg.cls+'">'+gg.label+'</span>'+
         '<span class="baseinfo">base '+bShow+'</span>'+
         '<span class="plus">+</span>'+
-        '<input class="premin" type="number" step="0.01" placeholder="0" value="'+getPrem(c,g)+'" data-prem="'+key+'"'+(ROLE==="EA"?' readonly':'')+'>'+
+        '<input class="premin" type="number" step="0.01" placeholder="0" value="'+getPrem(c,g)+'" data-prem="'+key+'">'+
         '<span class="eq">= <b>'+finalShow+'</b></span>'+
         '<button class="ibtn" title="Share this rate" onclick="openShare('+c.id+',\''+g+'\')">↗</button></div>';
     });
@@ -528,7 +537,7 @@ function delClient(id){
   persist();rebuildCities();render();flash("Client removed");
 }
 
-/* ---------- Google Sheet sync (client list) ---------- */
+/* ---------- Google Sheet sync ---------- */
 function deriveProducts(mat,bag){
   const t=((mat||"")+" "+(bag||"")).toUpperCase();
   const out=[]; const add=g=>{if(!out.includes(g))out.push(g);};
@@ -626,63 +635,51 @@ function disconnectSheet(){ state.sheetUrl="";state.sheetAuto=false;state.sheetC
   $("syncStat").textContent=""; $("sheetUrl").value=""; $("sheetAuto").checked=false; flash("Disconnected — back to built-in list"); }
 function updateSyncPill(){ const p=$("syncPill"); if(state.sheetClients&&state.sheetClients.length){p.style.display="inline";p.textContent="● on";}else{p.style.display="none";} }
 
-/* ---------- base rates: live from the Google Sheet "Base" tab ---------- */
-/* MD types base rates in the sheet; both dashboards read them here.
-   Chinchuka seed row auto-computes the TKP base = seed ÷ 0.60 + 10. */
-const SHEET_ID="1r-WPIh4hq-IBe-nSzszJRMa2l0a-ZjNif2ofmKtEkkA";
-const SHEET_BASE_TAB="Base";
-function baseCsvUrl(){ return "https://docs.google.com/spreadsheets/d/"+SHEET_ID+"/gviz/tq?tqx=out:csv&sheet="+encodeURIComponent(SHEET_BASE_TAB); }
-async function fetchBaseFromSheet(silent){
-  const sy=$("baseSync"); if(sy)sy.textContent="Syncing base rates…";
-  try{
-    const res=await fetch(baseCsvUrl()+"&t="+Date.now(),{cache:"no-store"});
-    if(!res.ok) throw new Error("HTTP "+res.status);
-    const text=await res.text();
-    if(/^\s*<(!doctype|html)/i.test(text)) throw new Error("'Base' tab not found — add a tab named Base (Product | Base).");
-    const rows=parseCSV(text);
-    let hi=rows.findIndex(r=>r.some(c=>/product/i.test(c))); if(hi<0)hi=0;
-    const nb={}; let seedVal="";
-    for(let r=hi+1;r<rows.length;r++){
-      const row=rows[r]||[]; const nm=(row[0]!=null?(""+row[0]).trim():""); const raw=(row[1]!=null?(""+row[1]).trim():"");
-      if(!nm||raw===""||isNaN(Number(raw))) continue;
-      if(/SEED|CHINCH/i.test(nm)){ seedVal=raw; nb.CHINCHUKA=Number(raw); if(nb.TKP_PG==null) nb.TKP_PG=Math.round((Number(raw)/0.6+10)*100)/100; }
-      else { nb[deriveGroup(nm,"")]=Number(raw); }
-    }
-    state.base=Object.assign({},state.base,nb);
-    if(seedVal!=="")state.chinchukaSeed=seedVal;
-    state.baseWhen=new Date().toLocaleString("en-IN",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
-    persist(); render(); renderBasePanel();
-    if(!silent) flash("✓ Base rates synced from Google Sheet");
-  }catch(e){
-    if(sy)sy.innerHTML='<span style="color:var(--red)">⚠ '+(e.message||"Couldn't reach the sheet")+'</span>';
-  }
+/* ---------- set base rate by product ---------- */
+function qsGroupChanged(){ const g=$("qsGroup").value; const v=(state.base&&state.base[g]!=null)?state.base[g]:""; $("qsRate").value=v; }
+function applyQuick(){
+  const g=$("qsGroup").value, val=$("qsRate").value.trim();
+  const label=(GROUPS[g]||GROUPS.OTHER).label;
+  if(val===""){flash("Enter a base rate first");$("qsRate").focus();return;}
+  state.base[g]=Number(val);
+  const n=allRows().filter(r=>r.g===g).length;
+  persist(); stamp(); render();
+  flash("✓ "+label+" base ₹"+fmt(Number(val))+" set — "+n+" client"+(n!==1?"s":"")+" updated");
 }
-function renderBasePanel(){
-  const chips=Object.keys(GROUPS).map(g=>{ const b=getBase(g); return b==null?null:(GROUPS[g].label+" <b>₹"+fmt(b)+"</b>"); }).filter(Boolean);
-  const bc=$("baseChips"); if(bc) bc.innerHTML = chips.length? chips.join("&nbsp; · &nbsp;") : "<span style='color:var(--red)'>No base rates yet — add them in the Google Sheet 'Base' tab, then Refresh.</span>";
-  const sy=$("baseSync"); if(sy) sy.innerHTML = state.baseWhen? ("🔗 Live from Google Sheet · last synced "+state.baseWhen+" · auto-refreshes every 20s") : "Base rates load live from your Google Sheet's <b>Base</b> tab — the MD edits them there.";
+
+/* ---------- Chinchuka seed → TKP base ---------- */
+/* TKP base = seed ÷ 0.60 + 10 */
+function seedFormula(seed){ const s=Number(seed); if(seed===""||isNaN(s)) return null; return Math.round((s/0.6 + 10)*100)/100; }
+function seedPreview(){
+  const s=$("seedRate").value.trim(), note=$("seedNote");
+  if(s===""){ note.innerHTML="TKP base = seed ÷ 0.60 + 10. Each TKP client = this base + their adjustment."; return; }
+  const t=seedFormula(s);
+  note.innerHTML="TKP base = ₹"+s+" ÷ 0.60 + 10 = <b>₹"+fmt(t)+"</b> (each TKP client = this + their adjustment)";
 }
-let baseTimer=null;
-function startBaseSync(){ if(baseTimer)clearInterval(baseTimer); fetchBaseFromSheet(true); baseTimer=setInterval(()=>fetchBaseFromSheet(true),20000); }
+function applySeed(){
+  const s=$("seedRate").value.trim();
+  if(s===""){flash("Enter the Chinchuka seed rate first");$("seedRate").focus();return;}
+  const t=seedFormula(s);
+  state.chinchukaSeed=s;
+  state.base.CHINCHUKA=Number(s);
+  state.base.TKP_PG=t;
+  const n=allRows().filter(r=>r.g==="TKP_PG").length;
+  persist(); stamp(); render();
+  flash("✓ Seed ₹"+s+" → TKP base ₹"+fmt(t)+" ("+n+" TKP client"+(n!==1?"s":"")+")");
+}
 
 /* ---------- misc ---------- */
 function close_(id){$(id).classList.remove("show");}
 function setUnit(){const opts=["₹/kg","₹/quintal","₹/MT","₹/bag"];let i=opts.indexOf(state.unit);state.unit=opts[(i+1)%opts.length];persist();$("unitLbl").textContent=state.unit;render();flash("Unit: "+state.unit);}
 function exportData(){const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="adinath-rates-backup.json";a.click();flash("Backup downloaded");}
-function importData(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{state=Object.assign(state,JSON.parse(e.target.result));if(!state.base)state.base={};if(!state.premium)state.premium={};if(state.chinchukaSeed==null)state.chinchukaSeed="";if(!Array.isArray(state.clients))state.clients=[];if(!Array.isArray(state.sheetClients))state.sheetClients=[];if(!state.nextId)state.nextId=1000;fixGroups(state.clients);fixGroups(state.sheetClients);persist();rebuildCities();render();renderBasePanel();$("unitLbl").textContent=state.unit;$("lastUpd").textContent=state.updated?("Updated "+state.updated):"Rates not set yet";flash("Backup restored");}catch(x){flash("Invalid file");}};r.readAsText(f);}
+function importData(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{state=Object.assign(state,JSON.parse(e.target.result));if(!state.base)state.base={};if(!state.premium)state.premium={};if(state.chinchukaSeed==null)state.chinchukaSeed="";if(!Array.isArray(state.clients))state.clients=[];if(!Array.isArray(state.sheetClients))state.sheetClients=[];if(!state.nextId)state.nextId=1000;fixGroups(state.clients);fixGroups(state.sheetClients);persist();rebuildCities();render();$("seedRate").value=state.chinchukaSeed||"";seedPreview();qsGroupChanged();$("unitLbl").textContent=state.unit;$("lastUpd").textContent=state.updated?("Updated "+state.updated):"Rates not set yet";flash("Backup restored");}catch(x){flash("Invalid file");}};r.readAsText(f);}
 
 /* ---------- init ---------- */
 $("today").textContent=todayStr();
 $("unitLbl").textContent=state.unit;
 if(state.updated)$("lastUpd").textContent="Updated "+state.updated;
-if(ROLE==="EA"){
-  document.title="Adinath — EA Rate View";
-  const h=document.querySelector("header h1"); if(h)h.textContent="Adinath — EA Rate View";
-  const sb=document.querySelector("header .sub"); if(sb)sb.textContent="Live view of MD's rates — read only";
-  const t=document.querySelector('button[onclick="openAdd()"]'); if(t)t.style.display="none";
-  const im=document.querySelector('button[onclick*="imp"]'); if(im)im.style.display="none";
-}
-initFilters();render();updateSyncPill();renderBasePanel();startBaseSync();
+initFilters();render();updateSyncPill();
+if(state.chinchukaSeed){ $("seedRate").value=state.chinchukaSeed; } seedPreview();
 if(state.sheetUrl){ setupAutoSync(); fetchSheet(true); }
 </script>
 </body>
