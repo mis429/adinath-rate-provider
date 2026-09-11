@@ -43,15 +43,14 @@
   input[type=number],input[type=text],select{background:#fff;border:1px solid var(--line);color:var(--ink);
     border-radius:9px;padding:9px 11px;font-size:14px;width:100%;outline:none}
   input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(14,124,102,.12)}
-  .unit{color:var(--muted);font-size:11.5px;white-space:nowrap}
   .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
   .toolbar .grow{flex:1;min-width:180px}
   .quickset{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:linear-gradient(135deg,#eafaf3,#eef3ff);
     border:1px solid #d3e8de;border-radius:12px;padding:11px 13px;margin-bottom:14px}
   .quickset .qs-lbl{font-weight:800;font-size:13px;color:var(--headA);display:flex;align-items:center;gap:6px}
-  .quickset select{width:auto;min-width:160px}
+  .quickset select{width:auto;min-width:150px}
   .quickset .rs{color:var(--accent);font-weight:800;font-size:16px}
-  .quickset input{width:120px;text-align:right;font-weight:800;font-size:15px;color:var(--accent)}
+  .quickset input{width:110px;text-align:right;font-weight:800;font-size:15px;color:var(--accent)}
   .quickset .qs-note{color:var(--muted);font-size:12px}
   .quickset.seedbar{background:linear-gradient(135deg,#fdf4e6,#f6efff);border-color:#eaddc4;margin-top:-6px}
   .quickset.seedbar .qs-lbl{color:#8a5a2b}
@@ -62,7 +61,6 @@
   .btn:hover{border-color:var(--accent);color:var(--accent)}
   .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:700}
   .btn.primary:hover{background:#0c6a58;color:#fff}
-  .btn.ghost{background:transparent}
   table{width:100%;border-collapse:collapse;font-size:13.5px}
   th,td{text-align:left;padding:10px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
   th{color:var(--muted);font-weight:700;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;
@@ -71,11 +69,14 @@
   .cname{font-weight:700}
   .csub{color:var(--muted);font-size:11.5px}
   .prodcell{padding-top:6px;padding-bottom:6px}
-  .prodline{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px dashed var(--line)}
+  .prodline{display:flex;align-items:center;gap:8px;padding:7px 0;border-top:1px dashed var(--line);flex-wrap:wrap}
   .prodline:first-child{border-top:none;padding-top:0}
   .prodline .pill{flex:0 0 auto}
-  .prodline .raterow{margin-left:auto}
-  .prodline .ratein{width:100px}
+  .prodline .baseinfo{color:var(--muted);font-size:11.5px;white-space:nowrap}
+  .prodline .plus{color:var(--muted);font-weight:700}
+  .prodline .premin{width:64px;text-align:right;font-weight:700;font-size:14px;color:var(--accent2);padding:6px 7px}
+  .prodline .eq{margin-left:auto;font-size:13.5px;color:var(--muted);white-space:nowrap}
+  .prodline .eq b{color:var(--accent);font-size:15px}
   .pill{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid transparent}
   .p-green{background:#e7f6ee;color:#0f7a44;border-color:#c6ead4}
   .p-husk{background:#f4ede2;color:#8a5a2b;border-color:#e6d7c1}
@@ -88,15 +89,9 @@
   .p-tukdi{background:#eef0ea;color:#5c6a4a;border-color:#d8ddc9}
   .p-seed{background:#efeafa;color:#5b3fb0;border-color:#ddd2f4}
   .p-other{background:#eef1f5;color:#556072;border-color:#dde3ec}
-  .raterow{display:flex;align-items:center;gap:4px;justify-content:flex-end}
-  .raterow .rs{color:var(--accent);font-weight:800;font-size:15px}
-  .ratein{width:110px;text-align:right;font-weight:800;font-size:15px;color:var(--accent);padding:8px 10px}
-  .num{text-align:right;font-variant-numeric:tabular-nums}
-  .rowbtns{display:flex;gap:6px;justify-content:flex-end}
   .ibtn{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;
     width:30px;height:30px;cursor:pointer;font-size:14px;display:inline-flex;align-items:center;justify-content:center}
   .ibtn:hover{color:var(--accent);border-color:var(--accent)}
-  .ibtn.on{color:var(--accent);border-color:var(--accent)}
   .stats{display:flex;gap:18px;flex-wrap:wrap;color:var(--muted);font-size:12.5px;margin-top:10px}
   .stats b{color:var(--ink)}
   .modal{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
@@ -129,13 +124,10 @@
     #tbl,#tbl tbody,#tbl tr,#tbl td{display:block;width:100%}
     #tbl tr{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;padding:10px 12px;background:#fff;box-shadow:0 1px 2px rgba(16,38,52,.05)}
     #tbl tr:hover{background:#fff}
-    #tbl td{border:none;padding:6px 0;display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:right}
-    #tbl td::before{content:attr(data-label);color:var(--muted);font-size:12px;font-weight:600;text-align:left;flex:0 0 auto}
-    #tbl td.cellname{display:block;text-align:left;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:2px}
-    #tbl td.cellname::before{display:none}
-    #tbl td.prodcell{display:block;text-align:left}
+    #tbl td{border:none;padding:6px 0;display:block;width:100%;text-align:left}
+    #tbl td.cellname{border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:2px}
+    #tbl td.hide-sm::before{content:"City — ";color:var(--muted);font-size:12px;font-weight:600}
     #tbl td.prodcell::before{content:"Products & rate";display:block;color:var(--muted);font-size:12px;font-weight:600;margin-bottom:4px}
-    .rowbtns{justify-content:flex-end}
     .ibtn{width:36px;height:36px}
     .sheet{border-radius:14px}
     .btn{padding:9px 12px}
@@ -153,7 +145,7 @@
       <div class="logo">A</div>
       <div>
         <h1>Adinath — Client Rate Provider</h1>
-        <div class="sub">Tamarind Kernel Powder • Chinchuka • Husk • Papu • Rawai • Embry • Kadi Kachra — daily client rates</div>
+        <div class="sub">Client rate = product base + each client's own adjustment</div>
       </div>
     </div>
     <div class="datebox">
@@ -168,21 +160,21 @@
   <!-- CLIENTS -->
   <div class="card">
     <h2>Client Rates <span class="tag" id="cnt"></span></h2>
-    <div class="hint" style="margin:2px 0 12px;color:var(--muted);font-size:12.5px">Type each rate in the box next to its product — a client who buys several products shows all of them under one name. That rate is what gets shared on WhatsApp / SMS.</div>
+    <div class="hint" style="margin:2px 0 12px;color:var(--muted);font-size:12.5px">Each client's rate = the product's <b>base</b> + that client's own <b>+/− adjustment</b> (the blue box). Set the base once and every client's final rate updates automatically.</div>
     <div class="quickset">
-      <span class="qs-lbl">⚡ Set today's rate</span>
+      <span class="qs-lbl">⚡ Set base rate</span>
       <select id="qsGroup" onchange="qsGroupChanged()"></select>
       <span class="rs">₹</span>
-      <input type="number" step="0.01" id="qsRate" placeholder="rate">
-      <button class="btn primary" onclick="applyQuick()">Apply to all</button>
-      <span class="qs-note">pick "All rows" or a product, type the rate, press Apply — it fills those rows. You can still change any one after.</span>
+      <input type="number" step="0.01" id="qsRate" placeholder="base">
+      <button class="btn primary" onclick="applyQuick()">Set base</button>
+      <span class="qs-note">sets the base for this product; every client on it becomes base + their adjustment.</span>
     </div>
     <div class="quickset seedbar">
       <span class="qs-lbl">🌰 Chinchuka seed rate</span>
       <span class="rs">₹</span>
       <input type="number" step="0.01" id="seedRate" placeholder="seed rate" oninput="seedPreview()">
-      <button class="btn primary" onclick="applySeed()">Auto-price TKP</button>
-      <span class="qs-note" id="seedNote">TKP rate = seed ÷ 0.60 + 10 → auto-fills every Tamarind Kernel Powder row.</span>
+      <button class="btn primary" onclick="applySeed()">Set TKP base</button>
+      <span class="qs-note" id="seedNote">TKP base = seed ÷ 0.60 + 10. Each TKP client = this base + their adjustment.</span>
     </div>
     <div class="toolbar">
       <button class="btn primary" onclick="openAdd()">➕ Add Client</button>
@@ -203,7 +195,7 @@
         <thead><tr>
           <th onclick="sortBy('name')">Client</th>
           <th class="hide-sm" onclick="sortBy('city')">City</th>
-          <th>Products &amp; Rate (₹)</th>
+          <th>Products · base + adj = rate (₹)</th>
         </tr></thead>
         <tbody id="rows"></tbody>
       </table>
@@ -248,11 +240,11 @@
         <div class="grow"><label class="muted" style="font-size:12px;display:block;margin-bottom:5px">City</label><input type="text" id="acCity" placeholder="e.g. Surat"></div>
         <div class="grow"><label class="muted" style="font-size:12px;display:block;margin-bottom:5px">Delivery location</label><input type="text" id="acLoc" placeholder="e.g. Sachin GIDC"></div>
       </div>
-      <div class="field"><label>Products * — tick every product this client buys (each gets its own line &amp; rate)</label><div id="acGroups" class="prodpick"></div></div>
+      <div class="field"><label>Products * — tick every product this client buys (each gets its own line)</label><div id="acGroups" class="prodpick"></div></div>
       <div class="toolbar" style="margin:0 0 4px">
         <div class="grow"><label class="muted" style="font-size:12px;display:block;margin-bottom:5px">Billing</label>
           <select id="acBill"><option value="ADINATH">ADINATH</option><option value="ADESHWAR">ADESHWAR</option><option value="">—</option></select></div>
-        <div class="grow"><label class="muted" style="font-size:12px;display:block;margin-bottom:5px">Rate (₹) — optional, all ticked products</label><input type="number" step="0.01" id="acAdj" placeholder="e.g. 46"></div>
+        <div class="grow"><label class="muted" style="font-size:12px;display:block;margin-bottom:5px">Adjustment +/− (optional)</label><input type="number" step="0.01" id="acAdj" placeholder="e.g. 1.5"></div>
       </div>
       <div class="toolbar" style="margin:14px 0 0">
         <button class="btn primary grow" onclick="saveClient()">✓ Add & Show in list</button>
@@ -266,10 +258,10 @@
   <div class="sheet">
     <div class="hd"><b>☁ Google Sheet Sync</b><button class="ibtn" onclick="close_('sheetModal')">✕</button></div>
     <div class="bd">
-      <div class="hint" style="margin-top:0">Paste your client-list Google Sheet link. When you add a client in the sheet, it appears here automatically on the next refresh.</div>
+      <div class="hint" style="margin-top:0">Paste your client-list Google Sheet link. Columns read: Company Name, Products, Rate (the +/− adjustment), Contact, City. Several products with "/" become separate lines.</div>
       <div class="field"><label>Client-list sheet link</label><input type="text" id="sheetUrl" placeholder="https://docs.google.com/spreadsheets/d/…"></div>
       <label style="display:flex;align-items:center;gap:8px;font-size:13.5px;margin-bottom:12px;cursor:pointer">
-        <input type="checkbox" id="sheetAuto" style="width:auto"> Auto-refresh clients every 3 minutes while open
+        <input type="checkbox" id="sheetAuto" style="width:auto"> Auto-refresh every 3 minutes while open
       </label>
       <div id="syncStat" class="hint" style="margin:0 0 12px"></div>
       <div class="toolbar" style="margin:0">
@@ -277,11 +269,7 @@
         <button class="btn" onclick="disconnectSheet()">Disconnect</button>
       </div>
       <div class="hint" style="margin:14px 0 0;line-height:1.5">
-        <b>One-time setup in Google Sheets:</b><br>
-        1. Open your client sheet → <b>Share</b> → change to <b>"Anyone with the link → Viewer"</b>.<br>
-        2. Copy the link from the address bar and paste it above.<br>
-        3. Keep column headers like <i>Company Name, Contact No, City, Delivery Location, Usual Material Purchase, Type of Bag</i>. List several materials with "/" and each becomes its own line.<br>
-        <span style="color:var(--accent)">Note:</span> "Anyone with link" makes the sheet readable by anyone who has the link.
+        <b>One-time setup:</b> open the sheet → <b>Share</b> → <b>"Anyone with the link → Viewer"</b>, then paste the link above.
       </div>
     </div>
   </div>
@@ -290,7 +278,7 @@
 <div class="flash" id="flash"></div>
 
 <script>
-/* ---------- product rate groups ---------- */
+/* ---------- product groups ---------- */
 const GROUPS = {
   TKP_PG:{label:"Tamarind Kernel Powder",  cls:"p-green", meta:"Tamarind Kernel Powder"},
   CHINCHUKA:{label:"Chinchuka (Tamarind Seed)", cls:"p-seed", meta:"Chinchuka — whole tamarind seed"},
@@ -305,90 +293,78 @@ const GROUPS = {
   OTHER: {label:"Other",        cls:"p-other", meta:"Mixed / other"}
 };
 
-/* ---------- client master data (products: list of the products they buy) ---------- */
+/* ---------- client master data ---------- */
+/* prem = per-client +/- adjustment added to the product base (from the rate sheet) */
 const CLIENTS = [
- {id:1,name:"Adachi",contact:"9879026224",city:"Ahmedabad",loc:"Vatva GIDC",group:"TKP_PG",bill:"ADESHWAR",mat:"TKP"},
- {id:2,name:"Amber Gum",contact:"9824099591",city:"Ahmedabad",loc:"Vatva GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
- {id:3,name:"Arihant Textchem",contact:"9426857546",city:"Surat",loc:"Pandya GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
- {id:4,name:"Ashapura Agro",contact:"9137566672",city:"Mumbai",loc:"Nalasupara",group:"HUSK",bill:"ADINATH",mat:"Husk"},
- {id:5,name:"B Bold",contact:"7558600449",city:"Surat",loc:"Sachin GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
- {id:6,name:"Best Processors Pvt Ltd",contact:"9481328195",city:"Surat",loc:"Kadodara",group:"HUSK",bill:"",mat:"Husk"},
- {id:7,name:"Bhagyalaxmi",contact:"9924555368",city:"Surat",loc:"Pandesara GIDC",group:"TKP_PG",bill:"",mat:"TKP"},
- {id:8,name:"Baldota",contact:"9890240739",city:"Urli Kanchan",loc:"Yevat / Kem",group:"RAWAI",products:["RAWAI","EMBRY","HUSK"],bill:"ADINATH",mat:"Rawai / Embry / Husk"},
- {id:9,name:"Calica Export",contact:"9825007400",city:"Ahmedabad",loc:"Naroda GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
- {id:10,name:"Colourtex",contact:"9481328195",city:"Surat",loc:"Pandesara GIDC",group:"PAPU",bill:"ADINATH",mat:"Papu"},
- {id:11,name:"Creative Traders",contact:"9481328195",city:"Surat",loc:"Kosamba GIDC",group:"HUSK",bill:"ADINATH",mat:"Husk"},
- {id:12,name:"DeepJyothi",contact:"9481328195",city:"Surat",loc:"Sachin GIDC",group:"PAPU",bill:"ADINATH",mat:"Papu / Rawali"},
- {id:13,name:"Esahanni Fashion Pvt Ltd",contact:"9825800569",city:"Surat",loc:"Olphad GIDC",group:"PAPU",bill:"ADINATH",mat:"Papu"},
- {id:14,name:"Gunatit",contact:"9481328195",city:"Vapi",loc:"Valsad",group:"HUSK",bill:"ADINATH",mat:"Husk"},
- {id:15,name:"Goodrich Overseas",contact:"9429099994",city:"Surendranagar",loc:"Lakhtar",group:"TKP_PG",bill:"ADESHWAR",mat:"TKP"},
- {id:16,name:"Hari Om",contact:"9537330123",city:"Surat",loc:"Sachin GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
- {id:17,name:"Hindustan Gum",contact:"9825008018",city:"Ahmedabad",loc:"Vatva GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
- {id:18,name:"Hare Krishna Shrinivas Agro",contact:"7046193517",city:"Silvasa",loc:"Silvasa",group:"HUSK",products:["HUSK","JADA"],bill:"ADINATH",mat:"Husk / Jada Bhusa"},
- {id:19,name:"Jahid Bhai",contact:"9907594502",city:"Indore",loc:"Indore",group:"TUKDI",bill:"ADINATH",mat:"Tukdi Nakadi"},
- {id:20,name:"Jenny",contact:"9998800703",city:"Ahmedabad",loc:"Vatva GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
- {id:21,name:"Kamdhenu Enterprise",contact:"9879397744",city:"Surat",loc:"Sachin GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
- {id:22,name:"LR Industries",contact:"9481328195",city:"Jodhpur",loc:"Jodhpur",group:"PAPU",bill:"ADINATH",mat:"Papu"},
- {id:23,name:"M/S Choudhary Traders",contact:"9824121968",city:"Surat",loc:"Kadodara",group:"HUSK",products:["HUSK","KADI","PAMA"],bill:"ADINATH",mat:"Husk / Kadi Kachra / Pama"},
- {id:24,name:"M/s Manali Gum Industries",contact:"9422025485",city:"Ankleshwar",loc:"Ankleshwar GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
- {id:25,name:"Maharastra Oil",contact:"9422025485",city:"Dhule",loc:"Awdhan MIDC",group:"HUSK",bill:"ADINATH",mat:"Husk"},
- {id:26,name:"Mangalni Trading",contact:"7666750018",city:"Ichalkaranji",loc:"Maharashtra",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
- {id:27,name:"Mangalya Agro Food",contact:"9921609020",city:"Pune",loc:"Perne Phata",group:"KADI",bill:"ADINATH",mat:"Kadi Kachra"},
- {id:28,name:"Maruti Hydrocolloids",contact:"9426339410",city:"Ahmedabad",loc:"Narol",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
- {id:29,name:"Micro Biopolymers",contact:"9429099994",city:"Surendranagar",loc:"Lakhtar",group:"TKP_PG",bill:"ADESHWAR",mat:"TKP"},
- {id:30,name:"Mithani Herbal Industries",contact:"",city:"Ahmedabad",loc:"Narol Road",group:"TKP_PG",products:["TKP_PG","PAPU"],bill:"ADINATH",mat:"TKP / Papu"},
- {id:31,name:"Neo Polychem",contact:"9429099994",city:"Surendranagar",loc:"Lakhtar",group:"TKP_PG",bill:"ADESHWAR",mat:"TKP"},
- {id:32,name:"Neptune Industries",contact:"9429099994",city:"Surendranagar",loc:"Surendranagar",group:"TKP_PG",bill:"ADESHWAR",mat:"TKP"},
- {id:33,name:"N K Trading",contact:"9284132797",city:"",loc:"",group:"OTHER",bill:"",mat:"—"},
- {id:34,name:"Pitambar Agro Foods",contact:"9829532077",city:"Jodhpur",loc:"Jodhpur",group:"PAMA",bill:"ADINATH",mat:"Pama"},
- {id:35,name:"Polson Ltd",contact:"2222626117",city:"Kolhapur",loc:"Kolhapur",group:"HUSK",bill:"ADINATH",mat:"Husk"},
- {id:36,name:"Rajshree Dyeing & Printing Mill",contact:"9825143728",city:"Surat",loc:"Tatithaiya",group:"OTHER",bill:"",mat:"—"},
- {id:37,name:"Rudra Industries",contact:"9825817009",city:"Ahmedabad",loc:"Mehsana",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
- {id:38,name:"Sai Iges Power Pvt Ltd",contact:"8605269999",city:"Kolhar",loc:"Kolhar",group:"KADI",bill:"ADINATH",mat:"Kadi Kachra"},
- {id:39,name:"Sai Krishna Mill",contact:"9481328195",city:"",loc:"",group:"HUSK",products:["HUSK","JADA"],bill:"ADINATH",mat:"Husk / Mix Bhusa"},
- {id:40,name:"Sai Sidhab Agro Farms",contact:"9820214311",city:"Mumbai",loc:"Murbad",group:"HUSK",bill:"ADINATH",mat:"Husk"},
- {id:41,name:"Salasar Enterprise",contact:"9825123694",city:"Surat",loc:"Sachin GIDC",group:"PAPU",products:["PAPU","TKP_PG"],bill:"ADINATH",mat:"Papu / TKP"},
- {id:42,name:"Sanchi Enterprise",contact:"9879397744",city:"Kutch",loc:"Bhuj",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
- {id:43,name:"Sankeshwar",contact:"8401555621",city:"Surat",loc:"Sachin GIDC",group:"TKP_PG",bill:"ADESHWAR",mat:"TKP"},
- {id:44,name:"Shree Sai Baba Mills",contact:"9924555368",city:"Surat",loc:"Sachin GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
- {id:45,name:"Shikar Prints",contact:"9924555368",city:"Surat",loc:"Sachin GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
- {id:46,name:"Shri Mahalaxmi Sales",contact:"9518781965",city:"Jalgaon",loc:"Amalner",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
- {id:47,name:"Shree Botanical",contact:"9511890245",city:"A.Nagar",loc:"MIDC / Door pickup",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
- {id:48,name:"Shree Navkar Dyechem",contact:"9481328195",city:"Surat",loc:"Navsari",group:"PAPU",bill:"ADINATH",mat:"Papu"},
- {id:49,name:"Shree Nivas Enterprises",contact:"7046193517",city:"Vapi",loc:"Silvasa",group:"HUSK",bill:"ADINATH",mat:"Husk"},
- {id:50,name:"Shriniwas Agro Ind.",contact:"9552474825",city:"Latur",loc:"Barshi",group:"EMBRY",bill:"",mat:"Embry"},
- {id:51,name:"Siddarth Agro",contact:"9422025485",city:"Jalna",loc:"Maharashtra",group:"HUSK",bill:"ADINATH",mat:"Husk"},
- {id:52,name:"Sri Ram Cooperation",contact:"9924555368",city:"Surat",loc:"Sachin GIDC",group:"TKP_PG",bill:"",mat:"TKP"},
- {id:53,name:"Spectrum Auxi Chem Pvt Ltd",contact:"",city:"Surat",loc:"Palsana",group:"PAPU",bill:"ADINATH",mat:"Papu"},
- {id:54,name:"Sumati",contact:"8401555621",city:"Surat",loc:"Sachin GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
- {id:55,name:"Tamarind Gum",contact:"9537330123",city:"Surat",loc:"Sachin GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
- {id:56,name:"Uma Industries",contact:"9428878927",city:"Surat",loc:"GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
- {id:57,name:"Valani Enterprise",contact:"9601996335",city:"Rajkot",loc:"Rajkot",group:"PAPU",bill:"ADINATH",mat:"Roasted Papu"},
- {id:58,name:"Varun Enterprise",contact:"9325100155",city:"Indore",loc:"Madhya Pradesh",group:"HUSK",bill:"ADINATH",mat:"Husk"},
- {id:59,name:"Veetax India",contact:"8764673390",city:"Jodhpur",loc:"Rajasthan",group:"TKP_PG",bill:"ADINATH",mat:"TKP"},
- {id:60,name:"Vimal Industries",contact:"9820437933",city:"Vapi",loc:"Silvasa",group:"PAPU",bill:"ADINATH",mat:"Papu"},
- {id:61,name:"Vishal Fuel Products",contact:"",city:"",loc:"",group:"HUSK",bill:"ADINATH",mat:"Husk"},
- {id:62,name:"VV Eco Gum",contact:"9082534880",city:"Ahmedabad",loc:"Odhav GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP"}
+ {id:1,name:"Adachi",contact:"9879026224",city:"Ahmedabad",loc:"Vatva GIDC",group:"TKP_PG",bill:"ADESHWAR",mat:"TKP",prem:0},
+ {id:2,name:"Amber Gum",contact:"9824099591",city:"Ahmedabad",loc:"Vatva GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP",prem:1},
+ {id:3,name:"Arihant Textchem",contact:"9426857546",city:"Surat",loc:"Pandya GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP",prem:1.5},
+ {id:4,name:"Ashapura Agro",contact:"9137566672",city:"Mumbai",loc:"Nalasupara",group:"HUSK",bill:"ADINATH",mat:"Husk",prem:0},
+ {id:5,name:"B Bold",contact:"7558600449",city:"Surat",loc:"Sachin GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP",prem:2},
+ {id:6,name:"Best Processors Pvt Ltd",contact:"9481328195",city:"Surat",loc:"Kadodara",group:"HUSK",bill:"",mat:"Husk",prem:0},
+ {id:7,name:"Bhagyalaxmi",contact:"9924555368",city:"Surat",loc:"Pandesara GIDC",group:"TKP_PG",bill:"",mat:"TKP",prem:1.5},
+ {id:8,name:"Baldota",contact:"9890240739",city:"Urli Kanchan",loc:"Yevat / Kem",group:"RAWAI",products:["RAWAI","EMBRY","HUSK"],bill:"ADINATH",mat:"Rawai / Embry / Husk",prem:0},
+ {id:9,name:"Calica Export",contact:"9825007400",city:"Ahmedabad",loc:"Naroda GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP",prem:1},
+ {id:10,name:"Colourtex",contact:"9481328195",city:"Surat",loc:"Pandesara GIDC",group:"PAPU",bill:"ADINATH",mat:"Papu",prem:0},
+ {id:11,name:"Creative Traders",contact:"9481328195",city:"Surat",loc:"Kosamba GIDC",group:"HUSK",bill:"ADINATH",mat:"Husk",prem:0},
+ {id:12,name:"DeepJyothi",contact:"9481328195",city:"Surat",loc:"Sachin GIDC",group:"PAPU",bill:"ADINATH",mat:"Papu / Rawali",prem:2},
+ {id:13,name:"Esahanni Fashion Pvt Ltd",contact:"9825800569",city:"Surat",loc:"Olphad GIDC",group:"PAPU",bill:"ADINATH",mat:"Papu",prem:2},
+ {id:14,name:"Gunatit",contact:"9481328195",city:"Vapi",loc:"Valsad",group:"HUSK",bill:"ADINATH",mat:"Husk",prem:1},
+ {id:15,name:"Goodrich Overseas",contact:"9429099994",city:"Surendranagar",loc:"Lakhtar",group:"TKP_PG",bill:"ADESHWAR",mat:"TKP",prem:0},
+ {id:16,name:"Hari Om",contact:"9537330123",city:"Surat",loc:"Sachin GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP",prem:1},
+ {id:17,name:"Hindustan Gum",contact:"9825008018",city:"Ahmedabad",loc:"Vatva GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP",prem:2},
+ {id:18,name:"Hare Krishna Shrinivas Agro",contact:"7046193517",city:"Silvasa",loc:"Silvasa",group:"HUSK",products:["HUSK","JADA"],bill:"ADINATH",mat:"Husk / Jada Bhusa",prem:1},
+ {id:19,name:"Jahid Bhai",contact:"9907594502",city:"Indore",loc:"Indore",group:"TUKDI",bill:"ADINATH",mat:"Tukdi Nakadi",prem:10},
+ {id:20,name:"Jenny",contact:"9998800703",city:"Ahmedabad",loc:"Vatva GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP",prem:1},
+ {id:21,name:"Kamdhenu Enterprise",contact:"9879397744",city:"Surat",loc:"Sachin GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP",prem:1},
+ {id:22,name:"LR Industries",contact:"9481328195",city:"Jodhpur",loc:"Jodhpur",group:"PAPU",bill:"ADINATH",mat:"Papu",prem:1},
+ {id:23,name:"M/S Choudhary Traders",contact:"9824121968",city:"Surat",loc:"Kadodara",group:"HUSK",products:["HUSK","KADI","PAMA"],bill:"ADINATH",mat:"Husk / Kadi Kachra / Pama",prem:0},
+ {id:24,name:"M/s Manali Gum Industries",contact:"9422025485",city:"Ankleshwar",loc:"Ankleshwar GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP",prem:1},
+ {id:25,name:"Maharastra Oil",contact:"9422025485",city:"Dhule",loc:"Awdhan MIDC",group:"HUSK",bill:"ADINATH",mat:"Husk",prem:0},
+ {id:26,name:"Mangalni Trading",contact:"7666750018",city:"Ichalkaranji",loc:"Maharashtra",group:"TKP_PG",bill:"ADINATH",mat:"TKP",prem:8},
+ {id:27,name:"Mangalya Agro Food",contact:"9921609020",city:"Pune",loc:"Perne Phata",group:"KADI",bill:"ADINATH",mat:"Kadi Kachra",prem:0},
+ {id:28,name:"Maruti Hydrocolloids",contact:"9426339410",city:"Ahmedabad",loc:"Narol",group:"TKP_PG",bill:"ADINATH",mat:"TKP",prem:2},
+ {id:29,name:"Micro Biopolymers",contact:"9429099994",city:"Surendranagar",loc:"Lakhtar",group:"TKP_PG",bill:"ADESHWAR",mat:"TKP",prem:-0.5},
+ {id:30,name:"Mithani Herbal Industries",contact:"",city:"Ahmedabad",loc:"Narol Road",group:"TKP_PG",products:["TKP_PG","PAPU"],bill:"ADINATH",mat:"TKP / Papu",prem:10},
+ {id:31,name:"Neo Polychem",contact:"9429099994",city:"Surendranagar",loc:"Lakhtar",group:"TKP_PG",bill:"ADESHWAR",mat:"TKP",prem:-0.5},
+ {id:32,name:"Neptune Industries",contact:"9429099994",city:"Surendranagar",loc:"Surendranagar",group:"TKP_PG",bill:"ADESHWAR",mat:"TKP",prem:-0.5},
+ {id:33,name:"N K Trading",contact:"9284132797",city:"",loc:"",group:"KADI",bill:"",mat:"Kadi Kachra",prem:0},
+ {id:34,name:"Pitambar Agro Foods",contact:"9829532077",city:"Jodhpur",loc:"Jodhpur",group:"PAMA",bill:"ADINATH",mat:"Pama",prem:2},
+ {id:35,name:"Polson Ltd",contact:"2222626117",city:"Kolhapur",loc:"Kolhapur",group:"HUSK",bill:"ADINATH",mat:"Husk",prem:3},
+ {id:36,name:"Rajshree Dyeing & Printing Mill",contact:"9825143728",city:"Surat",loc:"Tatithaiya",group:"OTHER",bill:"",mat:"—",prem:1},
+ {id:37,name:"Rudra Industries",contact:"9825817009",city:"Ahmedabad",loc:"Mehsana",group:"TKP_PG",bill:"ADINATH",mat:"TKP",prem:1},
+ {id:38,name:"Sai Iges Power Pvt Ltd",contact:"8605269999",city:"Kolhar",loc:"Kolhar",group:"KADI",bill:"ADINATH",mat:"Kadi Kachra",prem:0},
+ {id:39,name:"Sai Krishna Mill",contact:"9481328195",city:"",loc:"",group:"HUSK",products:["HUSK","JADA"],bill:"ADINATH",mat:"Husk / Mix Bhusa",prem:0},
+ {id:40,name:"Sai Sidhab Agro Farms",contact:"9820214311",city:"Mumbai",loc:"Murbad",group:"HUSK",bill:"ADINATH",mat:"Husk",prem:0},
+ {id:41,name:"Salasar Enterprise",contact:"9825123694",city:"Surat",loc:"Sachin GIDC",group:"PAPU",products:["PAPU","TKP_PG"],bill:"ADINATH",mat:"Papu / TKP",prem:1},
+ {id:42,name:"Sanchi Enterprise",contact:"9879397744",city:"Kutch",loc:"Bhuj",group:"TKP_PG",bill:"ADINATH",mat:"TKP",prem:3},
+ {id:43,name:"Sankeshwar",contact:"8401555621",city:"Surat",loc:"Sachin GIDC",group:"TKP_PG",bill:"ADESHWAR",mat:"TKP",prem:1},
+ {id:44,name:"Shree Sai Baba Mills",contact:"9924555368",city:"Surat",loc:"Sachin GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP",prem:5},
+ {id:45,name:"Shikar Prints",contact:"9924555368",city:"Surat",loc:"Sachin GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP",prem:3},
+ {id:46,name:"Shri Mahalaxmi Sales",contact:"9518781965",city:"Jalgaon",loc:"Amalner",group:"TKP_PG",bill:"ADINATH",mat:"TKP",prem:1},
+ {id:47,name:"Shree Botanical",contact:"9511890245",city:"A.Nagar",loc:"MIDC / Door pickup",group:"TKP_PG",bill:"ADINATH",mat:"TKP",prem:2},
+ {id:48,name:"Shree Navkar Dyechem",contact:"9481328195",city:"Surat",loc:"Navsari",group:"PAPU",bill:"ADINATH",mat:"Papu",prem:2},
+ {id:49,name:"Shree Nivas Enterprises",contact:"7046193517",city:"Vapi",loc:"Silvasa",group:"HUSK",bill:"ADINATH",mat:"Husk",prem:0},
+ {id:50,name:"Shriniwas Agro Ind.",contact:"9552474825",city:"Latur",loc:"Barshi",group:"EMBRY",bill:"",mat:"Embry",prem:27},
+ {id:51,name:"Siddarth Agro",contact:"9422025485",city:"Jalna",loc:"Maharashtra",group:"HUSK",bill:"ADINATH",mat:"Husk",prem:0},
+ {id:52,name:"Sri Ram Cooperation",contact:"9924555368",city:"Surat",loc:"Sachin GIDC",group:"TKP_PG",bill:"",mat:"TKP",prem:3},
+ {id:53,name:"Spectrum Auxi Chem Pvt Ltd",contact:"",city:"Surat",loc:"Palsana",group:"PAPU",bill:"ADINATH",mat:"Papu",prem:1},
+ {id:54,name:"Sumati",contact:"8401555621",city:"Surat",loc:"Sachin GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP",prem:1},
+ {id:55,name:"Tamarind Gum",contact:"9537330123",city:"Surat",loc:"Sachin GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP",prem:1},
+ {id:56,name:"Uma Industries",contact:"9428878927",city:"Surat",loc:"GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP",prem:2},
+ {id:57,name:"Valani Enterprise",contact:"9601996335",city:"Rajkot",loc:"Rajkot",group:"PAPU",bill:"ADINATH",mat:"Roasted Papu",prem:0},
+ {id:58,name:"Varun Enterprise",contact:"9325100155",city:"Indore",loc:"Madhya Pradesh",group:"HUSK",bill:"ADINATH",mat:"Husk",prem:0},
+ {id:59,name:"Veetax India",contact:"8764673390",city:"Jodhpur",loc:"Rajasthan",group:"TKP_PG",bill:"ADINATH",mat:"TKP",prem:2.5},
+ {id:60,name:"Vimal Industries",contact:"9820437933",city:"Vapi",loc:"Silvasa",group:"PAPU",bill:"ADINATH",mat:"Papu",prem:1},
+ {id:61,name:"Vishal Fuel Products",contact:"",city:"",loc:"",group:"HUSK",bill:"ADINATH",mat:"Husk",prem:1},
+ {id:62,name:"VV Eco Gum",contact:"9082534880",city:"Ahmedabad",loc:"Odhav GIDC",group:"TKP_PG",bill:"ADINATH",mat:"TKP",prem:1}
 ];
 
 /* ---------- state ---------- */
 const KEY="adinath_rate_provider_v1";
-let state={rate:{},groupRate:{},chinchukaSeed:"",unit:"₹/kg",updated:null,clients:[],nextId:1000,sheetUrl:"",sheetAuto:false,sheetClients:[],sheetWhen:null};
-function load(){ try{const s=localStorage.getItem(KEY); if(s)state=Object.assign(state,JSON.parse(s));}catch(e){} if(!state.rate)state.rate={}; if(!state.groupRate)state.groupRate={}; if(state.chinchukaSeed==null)state.chinchukaSeed=""; if(!Array.isArray(state.clients))state.clients=[]; if(!Array.isArray(state.sheetClients))state.sheetClients=[]; if(!state.nextId)state.nextId=1000; fixGroups(state.clients); fixGroups(state.sheetClients); migrateRates(); }
+let state={base:{},premium:{},chinchukaSeed:"",unit:"₹/kg",updated:null,clients:[],nextId:1000,sheetUrl:"",sheetAuto:false,sheetClients:[],sheetWhen:null};
+function load(){ try{const s=localStorage.getItem(KEY); if(s)state=Object.assign(state,JSON.parse(s));}catch(e){} if(!state.base)state.base={}; if(!state.premium)state.premium={}; if(state.chinchukaSeed==null)state.chinchukaSeed=""; if(!Array.isArray(state.clients))state.clients=[]; if(!Array.isArray(state.sheetClients))state.sheetClients=[]; if(!state.nextId)state.nextId=1000; fixGroups(state.clients); fixGroups(state.sheetClients); }
 function fixGroups(arr){ if(!Array.isArray(arr))return; arr.forEach(c=>{ if(!GROUPS[c.group]){ c.group=deriveGroup((c.group||"")+" "+(c.mat||""),""); } if(Array.isArray(c.products)) c.products=c.products.filter(g=>GROUPS[g]); }); }
-/* migrate old single-key rates (id) to composite keys (id@PRODUCT) */
-function migrateRates(){
-  const all=CLIENTS.concat(state.clients||[]).concat(state.sheetClients||[]);
-  Object.keys(state.rate).forEach(k=>{
-    if(k.indexOf("@")<0){
-      const c=all.find(x=>String(x.id)===k);
-      const g=c?clientProducts(c)[0]:"OTHER";
-      const nk=k+"@"+g;
-      if(state.rate[nk]==null||state.rate[nk]==="") state.rate[nk]=state.rate[k];
-      delete state.rate[k];
-    }
-  });
-}
 function clientProducts(c){ return (Array.isArray(c.products)&&c.products.length)?c.products:[c.group||"OTHER"]; }
 function rkey(id,g){ return id+"@"+g; }
 function allClients(){ const base=(state.sheetClients&&state.sheetClients.length)?state.sheetClients:CLIENTS; return base.concat(state.clients); }
@@ -402,10 +378,13 @@ const fmt=n=>(n===""||n==null||isNaN(n))?"—":Number(n).toLocaleString("en-IN",
 function flash(m){const f=$("flash");f.textContent=m;f.classList.add("show");clearTimeout(f._t);f._t=setTimeout(()=>f.classList.remove("show"),1600);}
 function todayStr(){const d=new Date();return d.toLocaleDateString("en-IN",{weekday:"short",day:"numeric",month:"short",year:"numeric"});}
 
+function getPrem(c,g){ const k=rkey(c.id,g); const o=state.premium[k]; if(o!=null&&o!=="") return o; return (c.prem!=null?c.prem:0); }
+function getBase(g){ const b=state.base[g]; return (b==null||b==="")?null:Number(b); }
 function finalRate(c,g){
-  const r=state.rate[rkey(c.id,g)];
-  if(r==null||r==="") return {val:null};
-  return {val:Number(r)};
+  const b=getBase(g);
+  if(b==null) return {val:null, base:null, prem:Number(getPrem(c,g))||0};
+  const p=Number(getPrem(c,g))||0;
+  return {val: Math.round((b+p)*100)/100, base:b, prem:p};
 }
 function stamp(){ state.updated=todayStr()+" "+new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
   $("lastUpd").textContent="Updated "+state.updated; persist(); }
@@ -419,10 +398,8 @@ function initFilters(){
     lab.querySelector("input").addEventListener("change",e=>lab.classList.toggle("on",e.target.checked));
     ap.appendChild(lab);
   });
-  const qg=$("qsGroup");
-  const allOpt=document.createElement("option");allOpt.value="__ALL__";allOpt.textContent="All rows (every product)";qg.appendChild(allOpt);
-  Object.entries(GROUPS).forEach(([k,v])=>{const o=document.createElement("option");o.value=k;o.textContent=v.label;qg.appendChild(o);});
-  qg.value="__ALL__"; qsGroupChanged();
+  const qg=$("qsGroup");Object.entries(GROUPS).forEach(([k,v])=>{const o=document.createElement("option");o.value=k;o.textContent=v.label;qg.appendChild(o);});
+  qg.value="HUSK"; qsGroupChanged();
   rebuildCities();
 }
 function rebuildCities(){
@@ -452,29 +429,42 @@ function render(){
     const prods=clientProducts(c).filter(g=>!fg||g===fg);
     let lines="";
     prods.forEach(g=>{
-      const gg=GROUPS[g]||GROUPS.OTHER, key=rkey(c.id,g);
-      lines+='<div class="prodline"><span class="pill '+gg.cls+'">'+gg.label+'</span>'+
-        '<div class="raterow"><span class="rs">₹</span><input class="ratein" type="number" step="0.01" placeholder="0" value="'+(state.rate[key]??"")+'" data-rate="'+key+'"></div>'+
+      const gg=GROUPS[g]||GROUPS.OTHER, key=rkey(c.id,g), fr=finalRate(c,g);
+      const bShow=fr.base==null?"—":"₹"+fmt(fr.base);
+      const finalShow=fr.val==null?"—":"₹"+fmt(fr.val);
+      lines+='<div class="prodline">'+
+        '<span class="pill '+gg.cls+'">'+gg.label+'</span>'+
+        '<span class="baseinfo">base '+bShow+'</span>'+
+        '<span class="plus">+</span>'+
+        '<input class="premin" type="number" step="0.01" placeholder="0" value="'+getPrem(c,g)+'" data-prem="'+key+'">'+
+        '<span class="eq">= <b>'+finalShow+'</b></span>'+
         '<button class="ibtn" title="Share this rate" onclick="openShare('+c.id+',\''+g+'\')">↗</button></div>';
     });
     const del=c.id>=1000?'<button class="ibtn" title="Delete this client" onclick="delClient('+c.id+')" style="margin-left:8px">🗑</button>':'';
     const tr=document.createElement("tr");
     tr.innerHTML=
       '<td class="cellname"><div class="cname">'+c.name+del+'</div><div class="csub">'+(c.contact?("📞 "+c.contact):"<span class=muted>no contact</span>")+(c.fromSheet?' · ☁ sheet':'')+'</div></td>'+
-      '<td class="hide-sm" data-label="City">'+(c.city||"<span class=muted>—</span>")+'<div class="csub">'+(c.loc||"")+'</div></td>'+
+      '<td class="hide-sm">'+(c.city||"<span class=muted>—</span>")+'<div class="csub">'+(c.loc||"")+'</div></td>'+
       '<td class="prodcell">'+lines+'</td>';
     rows.appendChild(tr);
   });
-  rows.querySelectorAll("input[data-rate]").forEach(inp=>{
-    inp.addEventListener("input",e=>{state.rate[e.target.dataset.rate]=e.target.value;persist();stamp();updateStats();});
+  rows.querySelectorAll("input[data-prem]").forEach(inp=>{
+    inp.addEventListener("input",e=>{
+      const key=e.target.dataset.prem; state.premium[key]=e.target.value; persist(); stamp();
+      const p=key.indexOf("@"); const idStr=key.slice(0,p), g=key.slice(p+1);
+      const c=allClients().find(x=>String(x.id)===idStr);
+      const fr=finalRate(c,g); const bEl=e.target.closest(".prodline").querySelector(".eq b");
+      if(bEl)bEl.textContent=fr.val==null?"—":"₹"+fmt(fr.val);
+      updateStats();
+    });
   });
   const allr=allRows().length;
-  $("cnt").textContent="— "+list.length+" clients shown · "+allr+" rate rows";
+  $("cnt").textContent="— "+list.length+" clients shown · "+allr+" product rows";
   updateStats();
 }
 function updateStats(){
   const tot=allRows(); const pr=tot.filter(r=>finalRate(r.c,r.g).val!=null).length;
-  $("stats").innerHTML="<span><b>"+pr+"</b> priced</span><span><b>"+(tot.length-pr)+"</b> without a rate yet</span>";
+  $("stats").innerHTML="<span><b>"+pr+"</b> priced</span><span><b>"+(tot.length-pr)+"</b> waiting for a base rate</span>";
 }
 
 /* ---------- share card ---------- */
@@ -486,7 +476,7 @@ function normNum(contact){
 }
 function openShare(id,g){
   const c=allClients().find(x=>x.id===id),gg=GROUPS[g]||GROUPS.OTHER,fr=finalRate(c,g);
-  const rate=fr.val==null?"(rate not set)":"₹"+fmt(fr.val)+" "+state.unit.replace("₹/","per ");
+  const rate=fr.val==null?"(base rate not set yet)":"₹"+fmt(fr.val)+" "+state.unit.replace("₹/","per ");
   const txt=
 "ADINATH INDUSTRIES\nRate Quotation\n\n"+
 "Date   : "+todayStr()+"\n"+
@@ -533,19 +523,16 @@ function saveClient(){
   const prods=[...$("acGroups").querySelectorAll("input:checked")].map(i=>i.value);
   if(!prods.length){flash("Tick at least one product");return;}
   const id=state.nextId++;
-  state.clients.push({id,name,contact:$("acContact").value.trim(),city:$("acCity").value.trim(),loc:$("acLoc").value.trim(),group:prods[0],products:prods,bill:$("acBill").value,mat:prods.map(g=>GROUPS[g].label).join(" / ")});
-  const rv=$("acAdj").value;
-  prods.forEach(g=>{ const k=rkey(id,g);
-    if(rv!=="")state.rate[k]=rv;
-    else if(state.groupRate&&state.groupRate[g]!=null&&state.groupRate[g]!=="")state.rate[k]=state.groupRate[g];
-  });
+  const adj=$("acAdj").value;
+  state.clients.push({id,name,contact:$("acContact").value.trim(),city:$("acCity").value.trim(),loc:$("acLoc").value.trim(),group:prods[0],products:prods,bill:$("acBill").value,mat:prods.map(g=>GROUPS[g].label).join(" / "),prem:adj===""?0:Number(adj)});
+  if(adj!=="")prods.forEach(g=>{state.premium[rkey(id,g)]=adj;});
   persist();rebuildCities();render();close_("addModal");flash("✓ "+name+" added");
 }
 function delClient(id){
   const c=state.clients.find(x=>x.id===id);
   if(!c)return;
   if(!confirm("Remove "+c.name+" from the list?"))return;
-  clientProducts(c).forEach(g=>delete state.rate[rkey(id,g)]);
+  clientProducts(c).forEach(g=>delete state.premium[rkey(id,g)]);
   state.clients=state.clients.filter(x=>x.id!==id);
   persist();rebuildCities();render();flash("Client removed");
 }
@@ -588,7 +575,7 @@ function mapSheet(rows){
   if(hi<0) hi=0;
   const head=rows[hi].map(h=>(h||"").trim().toLowerCase());
   const col=(...names)=>{for(const n of names){const idx=head.findIndex(h=>h.includes(n));if(idx>=0)return idx;}return -1;};
-  const ci={name:col("company name","company","party","name"),contact:col("contact","mobile","phone"),city:col("city"),loc:col("delivery location","location","delivery"),mat:col("usual material","material"),bag:col("type of bag","bag"),bill:col("adeshwar/adinath","billing")};
+  const ci={name:col("company name","company","party","name"),contact:col("contact","mobile","phone"),city:col("city"),loc:col("delivery location","location","delivery"),mat:col("products","usual material","material","product"),bag:col("type of bag","bag"),bill:col("adeshwar/adinath","billing"),rate:col("rate","adjustment","adj")};
   const out=[],seen={};
   for(let r=hi+1;r<rows.length;r++){
     const row=rows[r]||[];
@@ -596,9 +583,10 @@ function mapSheet(rows){
     const name=gv(ci.name);
     if(!name||/^note/i.test(name)) continue;
     const mat=gv(ci.mat),bag=gv(ci.bag),products=deriveProducts(mat,bag);
+    const rawRate=gv(ci.rate); const prem=(rawRate===""||isNaN(Number(rawRate)))?0:Number(rawRate);
     let id="s_"+name.toLowerCase().replace(/[^a-z0-9]/g,"").slice(0,24);
     if(seen[id]) id+="_"+r; seen[id]=1;
-    out.push({id,name,contact:gv(ci.contact),city:gv(ci.city),loc:gv(ci.loc),group:products[0],products,bill:gv(ci.bill).toUpperCase(),mat:mat||products.map(g=>GROUPS[g].label).join(" / "),fromSheet:true});
+    out.push({id,name,contact:gv(ci.contact),city:gv(ci.city),loc:gv(ci.loc),group:products[0],products,bill:gv(ci.bill).toUpperCase(),mat:mat||products.map(g=>GROUPS[g].label).join(" / "),prem,fromSheet:true});
   }
   return out;
 }
@@ -647,47 +635,44 @@ function disconnectSheet(){ state.sheetUrl="";state.sheetAuto=false;state.sheetC
   $("syncStat").textContent=""; $("sheetUrl").value=""; $("sheetAuto").checked=false; flash("Disconnected — back to built-in list"); }
 function updateSyncPill(){ const p=$("syncPill"); if(state.sheetClients&&state.sheetClients.length){p.style.display="inline";p.textContent="● on";}else{p.style.display="none";} }
 
-/* ---------- quick set rate by product ---------- */
-function qsGroupChanged(){ const g=$("qsGroup").value; const v=(g!=="__ALL__"&&state.groupRate&&state.groupRate[g]!=null)?state.groupRate[g]:""; $("qsRate").value=v; }
+/* ---------- set base rate by product ---------- */
+function qsGroupChanged(){ const g=$("qsGroup").value; const v=(state.base&&state.base[g]!=null)?state.base[g]:""; $("qsRate").value=v; }
 function applyQuick(){
   const g=$("qsGroup").value, val=$("qsRate").value.trim();
-  if(val===""){flash("Enter a rate first");$("qsRate").focus();return;}
-  let targets,label;
-  if(g==="__ALL__"){ targets=allRows(); label="all rows"; }
-  else { label=(GROUPS[g]||GROUPS.OTHER).label; state.groupRate[g]=val; targets=allRows().filter(r=>r.g===g); }
-  targets.forEach(r=>{state.rate[rkey(r.c.id,r.g)]=val;});
-  persist();
-  if(targets.length){ stamp(); render(); flash("✓ ₹"+val+" applied to "+targets.length+(g==="__ALL__"?" row"+(targets.length>1?"s":""):" "+label+" row"+(targets.length>1?"s":""))); }
-  else{ render(); flash("Saved ₹"+val+" for "+label+" — any client you set to this product will use it."); }
+  const label=(GROUPS[g]||GROUPS.OTHER).label;
+  if(val===""){flash("Enter a base rate first");$("qsRate").focus();return;}
+  state.base[g]=Number(val);
+  const n=allRows().filter(r=>r.g===g).length;
+  persist(); stamp(); render();
+  flash("✓ "+label+" base ₹"+fmt(Number(val))+" set — "+n+" client"+(n!==1?"s":"")+" updated");
 }
 
-/* ---------- Chinchuka seed → TKP auto-pricing ---------- */
-/* TKP row rate = seed ÷ 0.60 + 10 */
+/* ---------- Chinchuka seed → TKP base ---------- */
+/* TKP base = seed ÷ 0.60 + 10 */
 function seedFormula(seed){ const s=Number(seed); if(seed===""||isNaN(s)) return null; return Math.round((s/0.6 + 10)*100)/100; }
 function seedPreview(){
   const s=$("seedRate").value.trim(), note=$("seedNote");
-  if(s===""){ note.innerHTML="TKP rate = seed ÷ 0.60 + 10 → auto-fills every Tamarind Kernel Powder row."; return; }
+  if(s===""){ note.innerHTML="TKP base = seed ÷ 0.60 + 10. Each TKP client = this base + their adjustment."; return; }
   const t=seedFormula(s);
-  note.innerHTML="TKP rate = ₹"+s+" ÷ 0.60 + 10 = <b>₹"+fmt(t)+"</b> for every TKP row";
+  note.innerHTML="TKP base = ₹"+s+" ÷ 0.60 + 10 = <b>₹"+fmt(t)+"</b> (each TKP client = this + their adjustment)";
 }
 function applySeed(){
   const s=$("seedRate").value.trim();
   if(s===""){flash("Enter the Chinchuka seed rate first");$("seedRate").focus();return;}
   const t=seedFormula(s);
   state.chinchukaSeed=s;
-  state.groupRate.CHINCHUKA=s;
-  state.groupRate.TKP_PG=t;
-  let n=0;
-  allRows().forEach(r=>{ if(r.g==="TKP_PG"){state.rate[rkey(r.c.id,r.g)]=t;n++;} else if(r.g==="CHINCHUKA"){state.rate[rkey(r.c.id,r.g)]=s;} });
+  state.base.CHINCHUKA=Number(s);
+  state.base.TKP_PG=t;
+  const n=allRows().filter(r=>r.g==="TKP_PG").length;
   persist(); stamp(); render();
-  flash("✓ Seed ₹"+s+" → TKP ₹"+fmt(t)+" on "+n+" TKP row"+(n!==1?"s":""));
+  flash("✓ Seed ₹"+s+" → TKP base ₹"+fmt(t)+" ("+n+" TKP client"+(n!==1?"s":"")+")");
 }
 
 /* ---------- misc ---------- */
 function close_(id){$(id).classList.remove("show");}
 function setUnit(){const opts=["₹/kg","₹/quintal","₹/MT","₹/bag"];let i=opts.indexOf(state.unit);state.unit=opts[(i+1)%opts.length];persist();$("unitLbl").textContent=state.unit;render();flash("Unit: "+state.unit);}
 function exportData(){const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="adinath-rates-backup.json";a.click();flash("Backup downloaded");}
-function importData(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{state=Object.assign(state,JSON.parse(e.target.result));if(!state.rate)state.rate={};if(!state.groupRate)state.groupRate={};if(state.chinchukaSeed==null)state.chinchukaSeed="";if(!Array.isArray(state.clients))state.clients=[];if(!Array.isArray(state.sheetClients))state.sheetClients=[];if(!state.nextId)state.nextId=1000;fixGroups(state.clients);fixGroups(state.sheetClients);migrateRates();persist();rebuildCities();render();$("seedRate").value=state.chinchukaSeed||"";seedPreview();$("unitLbl").textContent=state.unit;$("lastUpd").textContent=state.updated?("Updated "+state.updated):"Rates not set yet";flash("Backup restored");}catch(x){flash("Invalid file");}};r.readAsText(f);}
+function importData(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{state=Object.assign(state,JSON.parse(e.target.result));if(!state.base)state.base={};if(!state.premium)state.premium={};if(state.chinchukaSeed==null)state.chinchukaSeed="";if(!Array.isArray(state.clients))state.clients=[];if(!Array.isArray(state.sheetClients))state.sheetClients=[];if(!state.nextId)state.nextId=1000;fixGroups(state.clients);fixGroups(state.sheetClients);persist();rebuildCities();render();$("seedRate").value=state.chinchukaSeed||"";seedPreview();qsGroupChanged();$("unitLbl").textContent=state.unit;$("lastUpd").textContent=state.updated?("Updated "+state.updated):"Rates not set yet";flash("Backup restored");}catch(x){flash("Invalid file");}};r.readAsText(f);}
 
 /* ---------- init ---------- */
 $("today").textContent=todayStr();
