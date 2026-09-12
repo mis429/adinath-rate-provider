@@ -188,7 +188,6 @@
       <span class="qs-note" id="seedNote">TKP base = seed ÷ 0.60 + 10. Each TKP client = this base + their adjustment.</span>
     </div>
     <div class="toolbar">
-      <button class="btn primary md-only" onclick="openEa()">📤 Give to EA</button>
       <button class="btn primary md-only" onclick="openAdd()">➕ Add Client</button>
       <button class="btn" onclick="setUnit()">Unit: <span id="unitLbl">₹/kg</span></button>
       <button class="btn md-only" onclick="openSheet()">☁ Sheet sync <span id="syncPill" style="display:none;color:var(--green);font-weight:700"></span></button>
@@ -282,22 +281,6 @@
       </div>
       <div class="hint" style="margin:14px 0 0;line-height:1.5">
         <b>One-time setup:</b> open the sheet → <b>Share</b> → <b>"Anyone with the link → Viewer"</b>, then paste the link above.
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- GIVE TO EA MODAL -->
-<div class="modal" id="eaModal" onclick="if(event.target===this)close_('eaModal')">
-  <div class="sheet">
-    <div class="hd"><b>📤 Give this rate view to your EA</b><button class="ibtn" onclick="close_('eaModal')">✕</button></div>
-    <div class="bd">
-      <div class="hint" style="margin-top:0">Send this link to your EA. It opens a <b>view-only</b> page that shows only the <b>final rate</b> for each client — no base-rate bar, no seed bar, no adjustment boxes. Re-send the link whenever you change today's rates.</div>
-      <div class="field"><label>EA link</label><input type="text" id="eaLink" readonly onclick="this.select()"></div>
-      <div id="eaWarn" class="hint" style="display:none;color:var(--red);margin:0 0 10px">⚠ You haven't set any rates yet — set a base rate first, then share.</div>
-      <div class="toolbar" style="margin:4px 0 0">
-        <button class="btn primary grow" onclick="copyEaLink()">📋 Copy link</button>
-        <button class="btn grow" style="background:#25D366;border-color:#25D366;color:#062015" onclick="waEaLink()">🟢 Send on WhatsApp</button>
       </div>
     </div>
   </div>
@@ -728,32 +711,6 @@ function applySeed(){
   const n=allRows().filter(r=>r.g==="TKP_PG").length;
   persist(); stamp(); render();
   flash("✓ Seed ₹"+s+" → TKP base ₹"+fmt(t)+" ("+n+" TKP client"+(n!==1?"s":"")+")");
-}
-
-/* ---------- Give to EA (share link) ---------- */
-function makeEaLink(){
-  const payload={base:state.base,premium:state.premium,chinchukaSeed:state.chinchukaSeed,unit:state.unit,updated:state.updated};
-  const enc=encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(payload)))));
-  return APP_URL+"#ea="+enc;
-}
-function openEa(){
-  const link=makeEaLink();
-  $("eaLink").value=link;
-  const hasRates=Object.keys(state.base||{}).some(k=>state.base[k]!=null&&state.base[k]!=="");
-  $("eaWarn").style.display=hasRates?"none":"block";
-  $("eaModal").classList.add("show");
-  setTimeout(()=>{$("eaLink").focus();$("eaLink").select();},60);
-}
-function copyEaLink(){
-  const t=$("eaLink").value;
-  navigator.clipboard.writeText(t).then(()=>flash("Link copied — send it to your EA"))
-    .catch(()=>{const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();flash("Link copied");});
-}
-function waEaLink(){
-  const t=$("eaLink").value;
-  const msg="Adinath — today's client rates (view-only):\n"+t;
-  window.open("https://wa.me/?text="+encodeURIComponent(msg),"_blank");
-  flash("Opening WhatsApp…");
 }
 
 /* ---------- misc ---------- */
